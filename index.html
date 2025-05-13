@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
     <title>Science-Based Workout Tracker</title>
     <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" href="/icon.png">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -261,3 +263,181 @@
                     <th>Exercise</th>
                     <th>Duration/Reps</th>
                     <th>Sets</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>PJR Pullover</td><td>2-3 x 6-8 (to failure)</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
+                <tr><td>Cable Tricep Push Away</td><td>2-3 x 10-12 (to failure + partials)</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
+                <tr><td>X Push Down</td><td>2-3 x 10-12 (to failure + partials)</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
+                <tr><td>Bench Dip</td><td>1 x to failure</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Shoulders Workout 1 -->
+    <div id="shoulders1-workout" class="workout-table">
+        <h2>Shoulders - Workout 1</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Exercise</th>
+                    <th>Duration/Reps</th>
+                    <th>Sets</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>Single Arm Dumbbell Overhead Press</td><td>2-3 x 6-8 (to failure)</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
+                <tr><td>Dumbbell Lateral Raise (Mechanical Drop Set)</td><td>3-4 x 10-12 (to failure)</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
+                <tr><td>Dumbbell Rear Delt Row</td><td>2 x 10-12</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Shoulders Workout 2 -->
+    <div id="shoulders2-workout" class="workout-table">
+        <h2>Shoulders - Workout 2</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Exercise</th>
+                    <th>Duration/Reps</th>
+                    <th>Sets</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>Dumbbell Cheat Lateral Raise</td><td>3-4 x 6-8 (to failure)</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
+                <tr><td>Incline Dumbbell Stretch Front Raise</td><td>2-3 x 10-12</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
+                <tr><td>Face Pull</td><td>2 x 10-12</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Exported Text</h2>
+    <textarea id="export-text"></textarea>
+
+    <script>
+        // Service Worker Registration for PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/service-worker.js')
+                .then(() => console.log('Service Worker registered'))
+                .catch(error => console.log('Service Worker failed:', error));
+        }
+
+        // Dropdown Menu Functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const select = document.getElementById('workout-select');
+            if (!select) {
+                console.error('Dropdown element not found');
+                return;
+            }
+            select.addEventListener('change', function() {
+                const selectedWorkout = this.value;
+                document.querySelectorAll('.workout-table').forEach(table => {
+                    table.classList.remove('active');
+                    if (table.id === `${selectedWorkout}-workout`) {
+                        table.classList.add('active');
+                    }
+                });
+            });
+        });
+
+        // Add Set Functionality
+        document.querySelectorAll('.add-set').forEach(button => {
+            button.addEventListener('click', function() {
+                const setsList = this.previousElementSibling;
+                const newSet = document.createElement('div');
+                newSet.className = 'set';
+                newSet.innerHTML = '<input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight">';
+                setsList.appendChild(newSet);
+            });
+        });
+
+        // Save Progress
+        function saveProgress() {
+            const workoutData = {};
+            document.querySelectorAll('.workout-table').forEach(table => {
+                const sets = [];
+                table.querySelectorAll('.sets-list').forEach(list => {
+                    const setData = [];
+                    list.querySelectorAll('.set').forEach(set => {
+                        const reps = set.querySelector('.reps').value;
+                        const weight = set.querySelector('.weight').value;
+                        if (reps || weight) {
+                            setData.push({ reps, weight });
+                        }
+                    });
+                    sets.push(setData);
+                });
+                workoutData[table.id] = sets;
+            });
+            localStorage.setItem('workoutProgress', JSON.stringify(workoutData));
+            alert('Progress saved!');
+        }
+
+        // Load Progress
+        function loadProgress() {
+            const savedData = localStorage.getItem('workoutProgress');
+            if (!savedData) {
+                alert('No saved progress found.');
+                return;
+            }
+            const workoutData = JSON.parse(savedData);
+            document.querySelectorAll('.workout-table').forEach(table => {
+                const sets = workoutData[table.id] || [];
+                table.querySelectorAll('.sets-list').forEach((list, index) => {
+                    list.innerHTML = '';
+                    const setData = sets[index] || [];
+                    setData.forEach(data => {
+                        const newSet = document.createElement('div');
+                        newSet.className = 'set';
+                        newSet.innerHTML = `<input type="text" placeholder="Reps" class="reps" value="${data.reps || ''}"><input type="text" placeholder="Weight" class="weight" value="${data.weight || ''}">`;
+                        list.appendChild(newSet);
+                    });
+                    if (!setData.length) {
+                        const newSet = document.createElement('div');
+                        newSet.className = 'set';
+                        newSet.innerHTML = '<input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight">';
+                        list.appendChild(newSet);
+                    }
+                });
+            });
+            alert('Progress loaded!');
+        }
+
+        // Reset Progress
+        function resetProgress() {
+            if (confirm('Are you sure you want to reset all progress?')) {
+                localStorage.removeItem('workoutProgress');
+                document.querySelectorAll('.sets-list').forEach(list => {
+                    list.innerHTML = '<div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div>';
+                });
+                alert('Progress reset!');
+            }
+        }
+
+        // Export to Text
+        function exportToText() {
+            let exportText = '';
+            document.querySelectorAll('.workout-table').forEach(table => {
+                exportText += `${table.querySelector('h2').textContent}\n`;
+                table.querySelectorAll('tr').forEach((row, index) => {
+                    const exercise = row.cells[0].textContent;
+                    const reps = row.cells[1].textContent;
+                    const setsList = row.querySelector('.sets-list');
+                    const sets = setsList.querySelectorAll('.set').length > 0 ? Array.from(setsList.querySelectorAll('.set')).map(set => {
+                        const repVal = set.querySelector('.reps').value;
+                        const weightVal = set.querySelector('.weight').value;
+                        return repVal || weightVal ? `Reps: ${repVal || '-'}, Weight: ${weightVal || '-'}` : null;
+                    }).filter(Boolean) : [];
+                    exportText += `Exercise ${index + 1}: ${exercise}, ${reps}\n`;
+                    if (sets.length) {
+                        exportText += `Sets: ${sets.join('; ')}\n`;
+                    }
+                });
+                exportText += '\n';
+            });
+            document.getElementById('export-text').value = exportText;
+        }
+    </script>
+</body>
+</html>
