@@ -1,14 +1,22 @@
 {
-  "name": "Workout App",
-  "short_name": "Workout",
-  "start_url": "/Lattest-Full-Workout-App-4-17-25_v2.html",
+  "name": "Science-Based Workout Tracker",
+  "short_name": "Workout Tracker",
+  "description": "A progressive web app for tracking science-based workout routines.",
+  "start_url": "/index.html",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#000000",
+  "orientation": "portrait",
   "icons": [
     {
-      "src": "/icon.png",
+      "src": "/icon-192.png",
       "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
       "type": "image/png"
     }
   ]
