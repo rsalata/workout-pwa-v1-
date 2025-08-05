@@ -3,440 +3,118 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="apple-mobile-web-app-capable" content="yes">
     <title>Science-Based Workout Tracker</title>
-    <link rel="manifest" href="/manifest.json">
-    <link rel="apple-touch-icon" href="/icon.png">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#ffffff">
+    <!-- Add icons/meta for PWA installability -->
+    <link rel="icon" href="icon-192x192.png" sizes="192x192">
+    <link rel="apple-touch-icon" href="icon-192x192.png">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 10px;
-            max-width: 100%;
-            margin: auto;
-            box-sizing: border-box;
-        }
-        h1, h2 { text-align: center; }
-        button { 
-            margin: 5px 0; 
-            padding: 8px; 
-            width: 100%; 
-            box-sizing: border-box;
-        }
-        select {
-            width: 100%;
-            padding: 8px;
-            margin-bottom: 10px;
-            font-size: 16px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 6px;
-            text-align: left;
-            font-size: 14px;
-        }
-        th { background-color: #f2f2f2; }
-        th:first-child, td:first-child { width: 50%; }
-        th:nth-child(2), td:nth-child(2) { width: 20%; }
-        th:nth-child(3), td:nth-child(3) { width: 30%; }
-        input[type="text"] { 
-            width: 100%; 
-            box-sizing: border-box;
-            padding: 4px;
-            font-size: 14px;
-        }
-        textarea { 
-            width: 100%; 
-            height: 150px; 
-            margin-top: 10px; 
-            font-size: 14px;
-        }
-        .workout-table { display: none; }
-        .workout-table.active { display: block; }
-        .sets-list {
-            display: flex;
-            flex-direction: column;
-        }
-        .set {
-            display: flex;
-            gap: 5px;
-            margin-bottom: 5px;
-        }
-        .reps, .weight {
-            width: 60px;
-            padding: 4px;
-            font-size: 14px;
-        }
-        .add-set {
-            padding: 4px 8px;
-            font-size: 14px;
-        }
-        @media (max-width: 600px) {
-            th, td { font-size: 12px; padding: 4px; }
-            button, select { font-size: 14px; }
-            .reps, .weight { width: 50px; }
-            .add-set { padding: 2px 4px; }
-        }
+        body { font-family: Arial, sans-serif; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        button { margin: 5px; }
     </style>
 </head>
 <body>
     <h1>Science-Based Workout Tracker</h1>
-    <select id="workout-select">
-        <option value="back1">Back - Workout 1</option>
-        <option value="back2">Back - Workout 2</option>
-        <option value="chest1">Chest - Workout 1</option>
-        <option value="chest2">Chest - Workout 2</option>
-        <option value="legs1">Legs - Workout 1</option>
-        <option value="legs2">Legs - Workout 2</option>
-        <option value="triceps1">Triceps - Workout 1</option>
-        <option value="triceps2">Triceps - Workout 2</option>
-        <option value="shoulders1">Shoulders - Workout 1</option>
-        <option value="shoulders2">Shoulders - Workout 2</option>
-    </select>
-    <button onclick="saveProgress()">Save Progress</button>
-    <button onclick="loadProgress()">Load Progress</button>
-    <button onclick="resetProgress()">Reset</button>
-    <button onclick="exportToText()">Export as Text</button>
-
-    <!-- Back Workout 1 -->
-    <div id="back1-workout" class="workout-table active">
-        <h2>Back - Workout 1</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Exercise</th>
-                    <th>Duration/Reps</th>
-                    <th>Sets</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr><td>Scap Pull-Down Primer</td><td>1-2 x 10-15 (submaximal)</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Seated Cable Row (Wide Elbows)</td><td>2-3 x 6-8 (to form failure)</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Narrow-Grip Lat Pulldown</td><td>2-3 x 10-12 (to failure + partials)</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Straight-Arm Pushdown</td><td>2-3 x 8-10 (to eccentric failure)</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>One-and-a-Half Rep Dumbbell Pullover Ladder</td><td>1 x to failure</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Banded/Bodyweight Pull-Up</td><td>1 x to failure (+ partials)</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-            </tbody>
-        </table>
-    </div>
-
-    <!-- Back Workout 2 -->
-    <div id="back2-workout" class="workout-table">
-        <h2>Back - Workout 2</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Exercise</th>
-                    <th>Duration/Reps</th>
-                    <th>Sets</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr><td>Face Pull (Primer)</td><td>2 x submaximal</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Barbell Row or Chest-Supported Row</td><td>2-3 x 6-8 (to form failure)</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Wide-Grip Pulldown</td><td>2-3 x 10-12 (to failure + partials)</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Dumbbell High Pull</td><td>2-3 x 8-10 (to form failure)</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>One-and-a-Half Rep High Cable Row Ladder</td><td>1 x to failure/arm</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Inverted Row</td><td>1 x to failure (+ partials)</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-            </tbody>
-        </table>
-    </div>
-
-    <!-- Chest Workout 1 -->
-    <div id="chest1-workout" class="workout-table">
-        <h2>Chest - Workout 1</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Exercise</th>
-                    <th>Duration/Reps</th>
-                    <th>Sets</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr><td>Banded External Rotation (Primer)</td><td>1-2 x submaximal</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Incline Dumbbell Bench Press (Thumbs Up)</td><td>3 x 5-8</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Cable Crossover</td><td>3 x 10-12 (to failure + partials)</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Dumbbell Floor Fly (Mechanical Drop Set)</td><td>2-3 x 8-10 (to eccentric failure)</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Deficit One-and-a-Half Rep Push-Up Ladder</td><td>1 x to failure</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Bodyweight Dip</td><td>1 x to failure (+ partials)</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-            </tbody>
-        </table>
-    </div>
-
-    <!-- Chest Workout 2 -->
-    <div id="chest2-workout" class="workout-table">
-        <h2>Chest - Workout 2</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Exercise</th>
-                    <th>Duration/Reps</th>
-                    <th>Sets</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr><td>Band Pull-Apart (Primer)</td><td>1-2 x submaximal</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Dumbbell Bench Press</td><td>3 x 5-8</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>High-to-Low Cable Crossover</td><td>3 x 10-12 (to failure + partials)</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Incline Cable Press</td><td>2-3 x 8-10 (to failure)</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Dip (Stretch Ladder)</td><td>1 x to failure</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Prison Yard Push-Up</td><td>1 x to failure</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-            </tbody>
-        </table>
-    </div>
-
-    <!-- Legs Workout 1 -->
-    <div id="legs1-workout" class="workout-table">
-        <h2>Legs - Workout 1</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Exercise</th>
-                    <th>Duration/Reps</th>
-                    <th>Sets</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr><td>Reverse Hyper (Primer)</td><td>1-2 x 10-15</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Deadlift</td><td>3 x 5</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Barbell Front Squat</td><td>2-3 x 6-8</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Alternating Dumbbell Reverse Lunge</td><td>2-3 x 10/leg (to failure)</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Seated Hamstring Curl or Slick Floor Bridge Curl</td><td>1 x 12-15 (to eccentric failure)</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Standing Calf Raise</td><td>2-3 x to failure</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-            </tbody>
-        </table>
-    </div>
-
-    <!-- Legs Workout 2 -->
-    <div id="legs2-workout" class="workout-table">
-        <h2>Legs - Workout 2</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Exercise</th>
-                    <th>Duration/Reps</th>
-                    <th>Sets</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr><td>Banded Overhead Squat (Primer)</td><td>1-2 x 10-15</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Barbell Back Squat</td><td>3 x 7</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Barbell Hip Thrust</td><td>2-3 x 6-8</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Dumbbell Spanish Squat</td><td>2-3 x 10 (to failure)</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Glute-Ham Raise (GHR) or Home GHR Alternative</td><td>1 x to failure (with eccentrics)</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Seated Calf Raise</td><td>2-3 x 10-12 (to failure + partials)</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-            </tbody>
-        </table>
-    </div>
-
-    <!-- Triceps Workout 1 -->
-    <div id="triceps1-workout" class="workout-table">
-        <h2>Triceps - Workout 1</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Exercise</th>
-                    <th>Duration/Reps</th>
-                    <th>Sets</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr><td>Tricep Push Down</td><td>2-3 x 6-8 (to failure)</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Lying Dumbbell Extension</td><td>2-3 x 8-10 (to failure + eccentrics)</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Dumbbell/Cable Tricep Kickback</td><td>2-3 x 10-12 (to failure + partials)</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Cobra Push-Up</td><td>1 x to failure</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-            </tbody>
-        </table>
-    </div>
-
-    <!-- Triceps Workout 2 -->
-    <div id="triceps2-workout" class="workout-table">
-        <h2>Triceps - Workout 2</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Exercise</th>
-                    <th>Duration/Reps</th>
-                    <th>Sets</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr><td>PJR Pullover</td><td>2-3 x 6-8 (to failure)</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Cable Tricep Push Away</td><td>2-3 x 10-12 (to failure + partials)</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>X Push Down</td><td>2-3 x 10-12 (to failure + partials)</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Bench Dip</td><td>1 x to failure</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-            </tbody>
-        </table>
-    </div>
-
-    <!-- Shoulders Workout 1 -->
-    <div id="shoulders1-workout" class="workout-table">
-        <h2>Shoulders - Workout 1</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Exercise</th>
-                    <th>Duration/Reps</th>
-                    <th>Sets</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr><td>Single Arm Dumbbell Overhead Press</td><td>2-3 x 6-8 (to failure)</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Dumbbell Lateral Raise (Mechanical Drop Set)</td><td>3-4 x 10-12 (to failure)</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Dumbbell Rear Delt Row</td><td>2 x 10-12</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-            </tbody>
-        </table>
-    </div>
-
-    <!-- Shoulders Workout 2 -->
-    <div id="shoulders2-workout" class="workout-table">
-        <h2>Shoulders - Workout 2</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Exercise</th>
-                    <th>Duration/Reps</th>
-                    <th>Sets</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr><td>Dumbbell Cheat Lateral Raise</td><td>3-4 x 6-8 (to failure)</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Incline Dumbbell Stretch Front Raise</td><td>2-3 x 10-12</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Face Pull</td><td>2 x 10-12</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-            </tbody>
-        </table>
-    </div>
-
-    <h2>Exported Text</h2>
-    <textarea id="export-text"></textarea>
+    <select id="workout-select"></select>
+    <button id="save-btn">Save Progress</button>
+    <button id="load-btn">Load Progress</button>
+    <button id="reset-btn">Reset</button>
+    <button id="export-btn">Export as Text</button>
+    <div id="workout-container"></div>
 
     <script>
-        // Service Worker Registration for PWA
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/service-worker.js')
-                .then(() => console.log('Service Worker registered'))
-                .catch(error => console.log('Service Worker failed:', error));
-        }
+        const workouts = {
+            "Back - Workout 1": [
+                {exercise: "Scap Pull-Down Primer", reps: "1-2 x 10-15 (submaximal)"},
+                // Add all original and Spartan workouts here, similar to Python data
+                // Example for Spartan:
+                "Spartan Chest/Back/Triceps A": [
+                    {exercise: "Bench Press", reps: "5 sets pyramid (15-20, 12-15, 8-12, 6-8, 5 reps)"},
+                    {exercise: "Deadlift", reps: "5 sets pyramid (15-20, 12-15, 8-12, 6-8, 5 reps)"},
+                    {exercise: "Chin-ups", reps: "3 sets to failure"},
+                    {exercise: "Close Grip Bench", reps: "5 sets pyramid"},
+                    {exercise: "Diamond Pushups", reps: "3 sets to failure"}
+                ],
+                // ... Add the rest of your workouts ...
+            };
 
-        // Dropdown Menu Functionality
-        document.addEventListener('DOMContentLoaded', function() {
+        let currentWorkout = null;
+        let setData = {};
+
+        function populateDropdown() {
             const select = document.getElementById('workout-select');
-            if (!select) {
-                console.error('Dropdown element not found');
-                return;
+            for (let key in workouts) {
+                const option = document.createElement('option');
+                option.value = key;
+                option.textContent = key;
+                select.appendChild(option);
             }
-            select.addEventListener('change', function() {
-                const selectedWorkout = this.value;
-                document.querySelectorAll('.workout-table').forEach(table => {
-                    table.classList.remove('active');
-                    if (table.id === `${selectedWorkout}-workout`) {
-                        table.classList.add('active');
-                    }
-                });
-            });
-        });
-
-        // Add Set Functionality
-        document.querySelectorAll('.add-set').forEach(button => {
-            button.addEventListener('click', function() {
-                const setsList = this.previousElementSibling;
-                const newSet = document.createElement('div');
-                newSet.className = 'set';
-                newSet.innerHTML = '<input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight">';
-                setsList.appendChild(newSet);
-            });
-        });
-
-        // Save Progress
-        function saveProgress() {
-            const workoutData = {};
-            document.querySelectorAll('.workout-table').forEach(table => {
-                const sets = [];
-                table.querySelectorAll('.sets-list').forEach(list => {
-                    const setData = [];
-                    list.querySelectorAll('.set').forEach(set => {
-                        const reps = set.querySelector('.reps').value;
-                        const weight = set.querySelector('.weight').value;
-                        if (reps || weight) {
-                            setData.push({ reps, weight });
-                        }
-                    });
-                    sets.push(setData);
-                });
-                workoutData[table.id] = sets;
-            });
-            localStorage.setItem('workoutProgress', JSON.stringify(workoutData));
-            alert('Progress saved!');
+            select.addEventListener('change', displayWorkout);
         }
 
-        // Load Progress
-        function loadProgress() {
-            const savedData = localStorage.getItem('workoutProgress');
-            if (!savedData) {
-                alert('No saved progress found.');
-                return;
-            }
-            const workoutData = JSON.parse(savedData);
-            document.querySelectorAll('.workout-table').forEach(table => {
-                const sets = workoutData[table.id] || [];
-                table.querySelectorAll('.sets-list').forEach((list, index) => {
-                    list.innerHTML = '';
-                    const setData = sets[index] || [];
-                    setData.forEach(data => {
-                        const newSet = document.createElement('div');
-                        newSet.className = 'set';
-                        newSet.innerHTML = `<input type="text" placeholder="Reps" class="reps" value="${data.reps || ''}"><input type="text" placeholder="Weight" class="weight" value="${data.weight || ''}">`;
-                        list.appendChild(newSet);
-                    });
-                    if (!setData.length) {
-                        const newSet = document.createElement('div');
-                        newSet.className = 'set';
-                        newSet.innerHTML = '<input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight">';
-                        list.appendChild(newSet);
-                    }
-                });
+        function displayWorkout() {
+            currentWorkout = document.getElementById('workout-select').value;
+            const container = document.getElementById('workout-container');
+            container.innerHTML = '';
+            workouts[currentWorkout].forEach(ex => {
+                const div = document.createElement('div');
+                div.innerHTML = `<h3>${ex.exercise} - ${ex.reps}</h3>`;
+                const setsDiv = document.createElement('div');
+                if (!setData[ex.exercise]) setData[ex.exercise] = [];
+                setData[ex.exercise].forEach((s, idx) => addSetInput(setsDiv, ex.exercise, idx, s.reps, s.weight));
+                const addBtn = document.createElement('button');
+                addBtn.textContent = 'Add Set';
+                addBtn.onclick = () => addSet(ex.exercise);
+                div.appendChild(setsDiv);
+                div.appendChild(addBtn);
+                container.appendChild(div);
             });
-            alert('Progress loaded!');
         }
 
-        // Reset Progress
-        function resetProgress() {
-            if (confirm('Are you sure you want to reset all progress?')) {
-                localStorage.removeItem('workoutProgress');
-                document.querySelectorAll('.sets-list').forEach(list => {
-                    list.innerHTML = '<div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div>';
-                });
-                alert('Progress reset!');
-            }
+        function addSet(exercise) {
+            if (!setData[exercise]) setData[exercise] = [];
+            setData[exercise].push({reps: '', weight: ''});
+            displayWorkout();
         }
 
-        // Export to Text
-        function exportToText() {
-            let exportText = '';
-            document.querySelectorAll('.workout-table').forEach(table => {
-                exportText += `${table.querySelector('h2').textContent}\n`;
-                table.querySelectorAll('tr').forEach((row, index) => {
-                    const exercise = row.cells[0].textContent;
-                    const reps = row.cells[1].textContent;
-                    const setsList = row.querySelector('.sets-list');
-                    const sets = setsList.querySelectorAll('.set').length > 0 ? Array.from(setsList.querySelectorAll('.set')).map(set => {
-                        const repVal = set.querySelector('.reps').value;
-                        const weightVal = set.querySelector('.weight').value;
-                        return repVal || weightVal ? `Reps: ${repVal || '-'}, Weight: ${weightVal || '-'}` : null;
-                    }).filter(Boolean) : [];
-                    exportText += `Exercise ${index + 1}: ${exercise}, ${reps}\n`;
-                    if (sets.length) {
-                        exportText += `Sets: ${sets.join('; ')}\n`;
-                    }
-                });
-                exportText += '\n';
+        function addSetInput(parent, exercise, idx, reps = '', weight = '') {
+            const setDiv = document.createElement('div');
+            setDiv.innerHTML = `Set ${idx + 1}: Reps <input value="${reps}"> Weight <input value="${weight}">`;
+            parent.appendChild(setDiv);
+        }
+
+        document.getElementById('save-btn').onclick = () => localStorage.setItem('workoutData', JSON.stringify(setData));
+        document.getElementById('load-btn').onclick = () => {
+            const data = localStorage.getItem('workoutData');
+            if (data) setData = JSON.parse(data);
+            displayWorkout();
+        };
+        document.getElementById('reset-btn').onclick = () => { setData = {}; displayWorkout(); };
+        document.getElementById('export-btn').onclick = () => {
+            let text = `Science-Based Workout Tracker\n${currentWorkout}\n`;
+            workouts[currentWorkout].forEach(ex => {
+                text += `${ex.exercise} ${ex.reps}\n`;
+                if (setData[ex.exercise]) setData[ex.exercise].forEach((s, idx) => text += `  Set ${idx + 1}: Reps ${s.reps}, Weight ${s.weight}\n`);
             });
-            document.getElementById('export-text').value = exportText;
+            const blob = new Blob([text], {type: 'text/plain'});
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'workout_export.txt';
+            a.click();
+        };
+
+        populateDropdown();
+
+        // Register service worker for PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(reg => console.log('Service Worker registered'))
+                    .catch(err => console.log('Service Worker registration failed:', err));
+            });
         }
     </script>
 </body>
