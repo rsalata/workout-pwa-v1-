@@ -3,10 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="apple-mobile-web-app-capable" content="yes">
     <title>Science-Based Workout Tracker</title>
     <link rel="manifest" href="/manifest.json">
-    <link rel="apple-touch-icon" href="/icon.png">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -82,6 +80,15 @@
             .add-set { padding: 2px 4px; }
         }
     </style>
+
+    <!-- PWA essentials -->
+    <meta name="theme-color" content="#111111">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Workout">
+    <link rel="apple-touch-icon" href="./icons/icon-192.png">
+    <link rel="manifest" href="./manifest.webmanifest">
+
 </head>
 <body>
     <h1>Science-Based Workout Tracker</h1>
@@ -263,181 +270,183 @@
                     <th>Exercise</th>
                     <th>Duration/Reps</th>
                     <th>Sets</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr><td>PJR Pullover</td><td>2-3 x 6-8 (to failure)</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Cable Tricep Push Away</td><td>2-3 x 10-12 (to failure + partials)</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>X Push Down</td><td>2-3 x 10-12 (to failure + partials)</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Bench Dip</td><td>1 x to failure</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-            </tbody>
-        </table>
+
+<!-- ========================= 5/3/1 BORING BUT BIG (BBB) MODULE ========================= -->
+<style>
+  .bbb-card{border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:16px;margin:18px 0;backdrop-filter:saturate(1.2) blur(2px)}
+  .bbb-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  .bbb-grid-4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+  .bbb-label{font-size:14px;opacity:.9}
+  .bbb-input,.bbb-select{width:100%;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.15);background:#111;color:#fff}
+  .bbb-table{width:100%;border-collapse:collapse;margin-top:12px;font-size:14px}
+  .bbb-table th,.bbb-table td{border-bottom:1px solid rgba(255,255,255,.08);padding:8px 10px;text-align:center}
+  .bbb-help{font-size:12px;opacity:.8;margin-top:6px}
+  .bbb-badge{display:inline-block;border:1px solid rgba(255,255,255,.2);border-radius:999px;padding:2px 8px;font-size:12px;margin-left:6px}
+  @media (max-width:720px){.bbb-grid,.bbb-grid-4{grid-template-columns:1fr} .bbb-table th,.bbb-table td{font-size:13px}}
+</style>
+
+<section id="bbb531" class="bbb-card">
+  <h2>5/3/1 — Boring But Big <span class="bbb-badge">Cycle Builder</span></h2>
+  <p class="bbb-help">
+    Enter your Training Max (TM) for each lift (usually 90% of true 1RM). Pick the week to auto-calc main work and BBB assistance.
+  </p>
+  <div class="bbb-grid-4">
+    <div>
+      <label class="bbb-label">Squat TM (lb)</label>
+      <input id="bbb-squat" class="bbb-input" type="number" min="0" step="5" value="315">
     </div>
-
-    <!-- Shoulders Workout 1 -->
-    <div id="shoulders1-workout" class="workout-table">
-        <h2>Shoulders - Workout 1</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Exercise</th>
-                    <th>Duration/Reps</th>
-                    <th>Sets</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr><td>Single Arm Dumbbell Overhead Press</td><td>2-3 x 6-8 (to failure)</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Dumbbell Lateral Raise (Mechanical Drop Set)</td><td>3-4 x 10-12 (to failure)</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Dumbbell Rear Delt Row</td><td>2 x 10-12</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-            </tbody>
-        </table>
+    <div>
+      <label class="bbb-label">Bench TM (lb)</label>
+      <input id="bbb-bench" class="bbb-input" type="number" min="0" step="5" value="225">
     </div>
-
-    <!-- Shoulders Workout 2 -->
-    <div id="shoulders2-workout" class="workout-table">
-        <h2>Shoulders - Workout 2</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Exercise</th>
-                    <th>Duration/Reps</th>
-                    <th>Sets</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr><td>Dumbbell Cheat Lateral Raise</td><td>3-4 x 6-8 (to failure)</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Incline Dumbbell Stretch Front Raise</td><td>2-3 x 10-12</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Face Pull</td><td>2 x 10-12</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-            </tbody>
-        </table>
+    <div>
+      <label class="bbb-label">Deadlift TM (lb)</label>
+      <input id="bbb-dead" class="bbb-input" type="number" min="0" step="5" value="405">
     </div>
+    <div>
+      <label class="bbb-label">Overhead Press TM (lb)</label>
+      <input id="bbb-ohp" class="bbb-input" type="number" min="0" step="5" value="135">
+    </div>
+  </div>
 
-    <h2>Exported Text</h2>
-    <textarea id="export-text"></textarea>
+  <div class="bbb-grid" style="margin-top:10px">
+    <div>
+      <label class="bbb-label">Week</label>
+      <select id="bbb-week" class="bbb-select">
+        <option value="1">Week 1 — 65/75/85 × 5+</option>
+        <option value="2">Week 2 — 70/80/90 × 3+</option>
+        <option value="3">Week 3 — 75/85/95 × 1+</option>
+        <option value="4">Week 4 — Deload 40/50/60 × 5</option>
+      </select>
+    </div>
+    <div>
+      <label class="bbb-label">BBB % of TM (5×10)</label>
+      <select id="bbb-bbbpct" class="bbb-select">
+        <option value="0.5">50%</option>
+        <option value="0.6">60%</option>
+        <option value="0.7">70%</option>
+      </select>
+    </div>
+  </div>
 
-    <script>
-        // Service Worker Registration for PWA
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/service-worker.js')
-                .then(() => console.log('Service Worker registered'))
-                .catch(error => console.log('Service Worker failed:', error));
-        }
+  <div style="margin-top:12px">
+    <label class="bbb-label">
+      Round to nearest
+    </label>
+    <select id="bbb-round" class="bbb-select" style="max-width:180px">
+      <option value="1">1 lb</option>
+      <option value="2.5">2.5 lb</option>
+      <option value="5" selected>5 lb</option>
+      <option value="10">10 lb</option>
+    </select>
+  </div>
 
-        // Dropdown Menu Functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            const select = document.getElementById('workout-select');
-            if (!select) {
-                console.error('Dropdown element not found');
-                return;
-            }
-            select.addEventListener('change', function() {
-                const selectedWorkout = this.value;
-                document.querySelectorAll('.workout-table').forEach(table => {
-                    table.classList.remove('active');
-                    if (table.id === `${selectedWorkout}-workout`) {
-                        table.classList.add('active');
-                    }
-                });
-            });
-        });
+  <table class="bbb-table" id="bbb-table" aria-label="5/3/1 table">
+    <thead>
+      <tr>
+        <th>Day</th>
+        <th>Lift</th>
+        <th>Set 1</th>
+        <th>Set 2</th>
+        <th>Set 3 (AMRAP)</th>
+        <th>BBB 5×10</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
 
-        // Add Set Functionality
-        document.querySelectorAll('.add-set').forEach(button => {
-            button.addEventListener('click', function() {
-                const setsList = this.previousElementSibling;
-                const newSet = document.createElement('div');
-                newSet.className = 'set';
-                newSet.innerHTML = '<input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight">';
-                setsList.appendChild(newSet);
-            });
-        });
+  <p class="bbb-help">
+    Main sets follow the classic percentage progressions for each week. BBB assistance is 5×10 at your chosen percentage. Always warm up appropriately.
+  </p>
+</section>
 
-        // Save Progress
-        function saveProgress() {
-            const workoutData = {};
-            document.querySelectorAll('.workout-table').forEach(table => {
-                const sets = [];
-                table.querySelectorAll('.sets-list').forEach(list => {
-                    const setData = [];
-                    list.querySelectorAll('.set').forEach(set => {
-                        const reps = set.querySelector('.reps').value;
-                        const weight = set.querySelector('.weight').value;
-                        if (reps || weight) {
-                            setData.push({ reps, weight });
-                        }
-                    });
-                    sets.push(setData);
-                });
-                workoutData[table.id] = sets;
-            });
-            localStorage.setItem('workoutProgress', JSON.stringify(workoutData));
-            alert('Progress saved!');
-        }
+<script>
+(function(){
+  const weeks = {
+    1: [0.65,0.75,0.85],
+    2: [0.70,0.80,0.90],
+    3: [0.75,0.85,0.95],
+    4: [0.40,0.50,0.60]
+  };
+  const days = [
+    {name:'Day 1', lift:'Overhead Press', key:'ohp'},
+    {name:'Day 2', lift:'Deadlift', key:'dead'},
+    {name:'Day 3', lift:'Bench', key:'bench'},
+    {name:'Day 4', lift:'Squat', key:'squat'}
+  ];
 
-        // Load Progress
-        function loadProgress() {
-            const savedData = localStorage.getItem('workoutProgress');
-            if (!savedData) {
-                alert('No saved progress found.');
-                return;
-            }
-            const workoutData = JSON.parse(savedData);
-            document.querySelectorAll('.workout-table').forEach(table => {
-                const sets = workoutData[table.id] || [];
-                table.querySelectorAll('.sets-list').forEach((list, index) => {
-                    list.innerHTML = '';
-                    const setData = sets[index] || [];
-                    setData.forEach(data => {
-                        const newSet = document.createElement('div');
-                        newSet.className = 'set';
-                        newSet.innerHTML = `<input type="text" placeholder="Reps" class="reps" value="${data.reps || ''}"><input type="text" placeholder="Weight" class="weight" value="${data.weight || ''}">`;
-                        list.appendChild(newSet);
-                    });
-                    if (!setData.length) {
-                        const newSet = document.createElement('div');
-                        newSet.className = 'set';
-                        newSet.innerHTML = '<input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight">';
-                        list.appendChild(newSet);
-                    }
-                });
-            });
-            alert('Progress loaded!');
-        }
+  const $ = id => document.getElementById(id);
+  const tbody = document.querySelector('#bbb-table tbody');
 
-        // Reset Progress
-        function resetProgress() {
-            if (confirm('Are you sure you want to reset all progress?')) {
-                localStorage.removeItem('workoutProgress');
-                document.querySelectorAll('.sets-list').forEach(list => {
-                    list.innerHTML = '<div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div>';
-                });
-                alert('Progress reset!');
-            }
-        }
+  function roundTo(x, base){
+    base = Number(base)||1;
+    return Math.round(x/base)*base;
+  }
 
-        // Export to Text
-        function exportToText() {
-            let exportText = '';
-            document.querySelectorAll('.workout-table').forEach(table => {
-                exportText += `${table.querySelector('h2').textContent}\n`;
-                table.querySelectorAll('tr').forEach((row, index) => {
-                    const exercise = row.cells[0].textContent;
-                    const reps = row.cells[1].textContent;
-                    const setsList = row.querySelector('.sets-list');
-                    const sets = setsList.querySelectorAll('.set').length > 0 ? Array.from(setsList.querySelectorAll('.set')).map(set => {
-                        const repVal = set.querySelector('.reps').value;
-                        const weightVal = set.querySelector('.weight').value;
-                        return repVal || weightVal ? `Reps: ${repVal || '-'}, Weight: ${weightVal || '-'}` : null;
-                    }).filter(Boolean) : [];
-                    exportText += `Exercise ${index + 1}: ${exercise}, ${reps}\n`;
-                    if (sets.length) {
-                        exportText += `Sets: ${sets.join('; ')}\n`;
-                    }
-                });
-                exportText += '\n';
-            });
-            document.getElementById('export-text').value = exportText;
-        }
-    </script>
-</body>
-</html>
+  function fmt(w){ return (w>0? w : 0).toFixed(0) + ' lb'; }
+
+  function getTM(){
+    return {
+      squat: Number($('bbb-squat').value||0),
+      bench: Number($('bbb-bench').value||0),
+      dead:  Number($('bbb-dead').value||0),
+      ohp:   Number($('bbb-ohp').value||0)
+    };
+  }
+
+  function render(){
+    const tm = getTM();
+    const wk = $('bbb-week').value;
+    const bbbpct = Number($('bbb-bbbpct').value||0.5);
+    const rnd = Number($('bbb-round').value||5);
+    const pcts = weeks[wk];
+
+    tbody.innerHTML='';
+    days.forEach(d => {
+      const t = tm[d.key]||0;
+      const s1 = roundTo(t * pcts[0], rnd);
+      const s2 = roundTo(t * pcts[1], rnd);
+      const s3 = roundTo(t * pcts[2], rnd);
+      const bbb = roundTo(t * bbbpct, rnd);
+      const amrap = (wk==='4') ? '×5' : (wk==='1' ? '×5+' : (wk==='2' ? '×3+' : '×1+'));
+
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${d.name}</td>
+        <td>${d.lift}</td>
+        <td>${fmt(s1)} × ${wk==='4'?'5':'5'}</td>
+        <td>${fmt(s2)} × ${wk==='4'?'5':'5'}</td>
+        <td>${fmt(s3)} ${amrap}</td>
+        <td>${fmt(bbb)} × 10 (5 sets)</td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    // Persist simple state
+    try{
+      localStorage.setItem('bbb531_state', JSON.stringify({
+        tm: getTM(), wk, bbbpct, rnd
+      }));
+    }catch(e){}
+  }
+
+  // Restore
+  try{
+    const saved = JSON.parse(localStorage.getItem('bbb531_state')||'null');
+    if(saved){
+      $('bbb-squat').value = saved.tm.squat;
+      $('bbb-bench').value = saved.tm.bench;
+      $('bbb-dead').value  = saved.tm.dead;
+      $('bbb-ohp').value   = saved.tm.ohp;
+      $('bbb-week').value  = saved.wk;
+      $('bbb-bbbpct').value= saved.bbbpct;
+      $('bbb-round').value = saved.rnd;
+    }
+  }catch(e){}
+
+  ['bbb-squat','bbb-bench','bbb-dead','bbb-ohp','bbb-week','bbb-bbbpct','bbb-round']
+    .forEach(id => document.getElementById(id).addEventListener('input', render));
+
+  render();
+})();
+</script>
