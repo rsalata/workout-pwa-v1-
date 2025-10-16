@@ -1,23 +1,23 @@
 {
   "name": "Science-Based Workout Tracker",
-  "short_name": "Workout Tracker",
-  "description": "A progressive web app for tracking science-based workout routines.",
-  "start_url": "/index.html",
-  "scope": "/",
+  "short_name": "Workout",
+  "start_url": "./?source=pwa",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#000000",
-  "orientation": "portrait",
+  "theme_color": "#111111",
   "icons": [
     {
-      "src": "/icon-192.png",
+      "src": "./icons/icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
-      "src": "/icon-512.png",
+      "src": "./icons/icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
