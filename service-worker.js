@@ -1,72 +1,57 @@
-const CACHE_NAME = 'workout-app-cache-v2'; // Updated version for new cache
-const urlsToCache = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/icon.png'
+
+const CACHE = 'workout-pwa-v1';
+const ASSETS = [
+  './',
+  './index.html',
+  './manifest.webmanifest',
+  './sw.js',
+  './icons/icon-192.png',
+  './icons/icon-512.png'
 ];
 
-// Install event: Cache essential files
 self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => {
-        console.log('Caching files:', urlsToCache);
-        return cache.addAll(urlsToCache);
-      })
-      .catch(error => {
-        console.error('Cache installation failed:', error);
-      })
-  );
-  // Force the waiting service worker to activate immediately
+  event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(ASSETS)));
   self.skipWaiting();
 });
 
-// Activate event: Clean up old caches
 self.addEventListener('activate', event => {
   event.waitUntil(
-    caches.keys().then(cacheNames => {
-      return Promise.all(
-        cacheNames.map(cache => {
-          if (cache !== CACHE_NAME) {
-            console.log('Deleting old cache:', cache);
-            return caches.delete(cache);
-          }
-        })
-      );
-    })
-    .catch(error => {
-      console.error('Cache cleanup failed:', error);
-    })
+    caches.keys().then(keys => Promise.all(keys.map(k => k !== CACHE && caches.delete(k))))
   );
-  // Claim clients to apply the new service worker immediately
   self.clients.claim();
 });
 
-// Fetch event: Serve cached content or fetch from network
 self.addEventListener('fetch', event => {
+  const { request } = event;
+  const url = new URL(request.url);
+
+  // Only handle GET
+  if (request.method !== 'GET') return;
+
+  // App shell: cache-first
+  if (ASSETS.includes(url.pathname.replace(/.*\//, './'))) {
+    event.respondWith(
+      caches.match(request).then(cached => cached || fetch(request))
+    );
+    return;
+  }
+
+  // HTML navigation requests: network-first with fallback to cache
+  if (request.mode === 'navigate' || (request.headers.get('accept') || '').includes('text/html')) {
+    event.respondWith(
+      fetch(request)
+        .then(res => {
+          const resClone = res.clone();
+          caches.open(CACHE).then(cache => cache.put(request, resClone));
+          return res;
+        })
+        .catch(() => caches.match(request).then(c => c || caches.match('./index.html')))
+    );
+    return;
+  }
+
+  // Others: cache-first, then network
   event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        // Return cached response if found, else fetch from network
-        if (response) {
-          return response;
-        }
-        return fetch(event.request)
-          .then(networkResponse => {
-            // Cache new responses for future use
-            if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
-              caches.open(CACHE_NAME).then(cache => {
-                cache.put(event.request, networkResponse.clone());
-              });
-            }
-            return networkResponse;
-          })
-          .catch(error => {
-            console.error('Fetch failed:', error);
-            // Optional: Return a fallback page if offline and no cache
-            return caches.match('/index.html');
-          });
-      })
+    caches.match(request).then(cached => cached || fetch(request))
   );
 });
