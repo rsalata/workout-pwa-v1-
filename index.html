@@ -1,452 +1,200 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Science-Based Workout Tracker</title>
-    <link rel="manifest" href="/manifest.json">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 10px;
-            max-width: 100%;
-            margin: auto;
-            box-sizing: border-box;
-        }
-        h1, h2 { text-align: center; }
-        button { 
-            margin: 5px 0; 
-            padding: 8px; 
-            width: 100%; 
-            box-sizing: border-box;
-        }
-        select {
-            width: 100%;
-            padding: 8px;
-            margin-bottom: 10px;
-            font-size: 16px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 6px;
-            text-align: left;
-            font-size: 14px;
-        }
-        th { background-color: #f2f2f2; }
-        th:first-child, td:first-child { width: 50%; }
-        th:nth-child(2), td:nth-child(2) { width: 20%; }
-        th:nth-child(3), td:nth-child(3) { width: 30%; }
-        input[type="text"] { 
-            width: 100%; 
-            box-sizing: border-box;
-            padding: 4px;
-            font-size: 14px;
-        }
-        textarea { 
-            width: 100%; 
-            height: 150px; 
-            margin-top: 10px; 
-            font-size: 14px;
-        }
-        .workout-table { display: none; }
-        .workout-table.active { display: block; }
-        .sets-list {
-            display: flex;
-            flex-direction: column;
-        }
-        .set {
-            display: flex;
-            gap: 5px;
-            margin-bottom: 5px;
-        }
-        .reps, .weight {
-            width: 60px;
-            padding: 4px;
-            font-size: 14px;
-        }
-        .add-set {
-            padding: 4px 8px;
-            font-size: 14px;
-        }
-        @media (max-width: 600px) {
-            th, td { font-size: 12px; padding: 4px; }
-            button, select { font-size: 14px; }
-            .reps, .weight { width: 50px; }
-            .add-set { padding: 2px 4px; }
-        }
-    </style>
-
-    <!-- PWA essentials -->
-    <meta name="theme-color" content="#111111">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Workout">
-    <link rel="apple-touch-icon" href="./icons/icon-192.png">
-    <link rel="manifest" href="./manifest.webmanifest">
-
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Workout Demo — Science‑Based & BBB</title>
+  <style>
+    :root{ --bg:#0e1116; --panel:#151926; --card:#1b2132; --text:#e6e9ee; --muted:#aab3c2; --ring:rgba(255,255,255,.08); --acc:#7dd3fc; --yellow:#ffd200; --ok:#22c55e; --bad:#ef4444; }
+    *{box-sizing:border-box}
+    body{margin:0;background:linear-gradient(180deg,#0c1018 0%,#0e1116 100%);color:var(--text);font:500 16px/1.45 system-ui,Segoe UI,Roboto,Inter,Arial}
+    .shell{max-width:980px;margin:0 auto;padding:28px 18px}
+    header{position:sticky;top:0;background:rgba(14,17,22,.7);backdrop-filter:saturate(1.1) blur(6px);border-bottom:1px solid var(--ring);z-index:10}
+    .head{max-width:980px;margin:0 auto;display:flex;align-items:center;gap:14px;padding:10px 18px}
+    .logo{width:34px;height:34px;border-radius:10px;background:#111;border:1px solid var(--ring);display:grid;place-items:center;font-weight:800}
+    h1{font-size:20px;margin:0}
+    .card{background:var(--card);border:1px solid var(--ring);border-radius:16px;padding:18px;margin:18px 0}
+    .muted{color:var(--muted)}
+    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+    .grid-4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+    label{font-size:13px;color:var(--muted)}
+    input,select{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--ring);background:#0f1320;color:var(--text)}
+    table{width:100%;border-collapse:collapse;margin-top:12px}
+    th,td{padding:10px;border-bottom:1px solid var(--ring);text-align:center}
+    .badge{display:inline-block;padding:2px 8px;border:1px solid var(--ring);border-radius:999px;font-size:12px;margin-left:8px}
+    .chip{display:inline-block;padding:2px 8px;border-radius:999px;border:1px solid var(--ring);font-size:12px;margin-left:8px}
+    .ok{color:var(--ok);border-color:rgba(34,197,94,.3)} .bad{color:var(--bad);border-color:rgba(239,68,68,.3)}
+    footer{margin:40px 0 20px;color:var(--muted);font-size:13px;text-align:center}
+    @media (max-width:720px){.grid,.grid-4{grid-template-columns:1fr}}
+  </style>
+  <meta name="theme-color" content="#0e1116">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="Workout">
+  <link rel="apple-touch-icon" href="./icons/icon-192.png">
+  <link rel="manifest" href="./manifest.webmanifest">
 </head>
 <body>
-    <h1>Science-Based Workout Tracker</h1>
-    <select id="workout-select">
-        <option value="back1">Back - Workout 1</option>
-        <option value="back2">Back - Workout 2</option>
-        <option value="chest1">Chest - Workout 1</option>
-        <option value="chest2">Chest - Workout 2</option>
-        <option value="legs1">Legs - Workout 1</option>
-        <option value="legs2">Legs - Workout 2</option>
-        <option value="triceps1">Triceps - Workout 1</option>
-        <option value="triceps2">Triceps - Workout 2</option>
-        <option value="shoulders1">Shoulders - Workout 1</option>
-        <option value="shoulders2">Shoulders - Workout 2</option>
-    </select>
-    <button onclick="saveProgress()">Save Progress</button>
-    <button onclick="loadProgress()">Load Progress</button>
-    <button onclick="resetProgress()">Reset</button>
-    <button onclick="exportToText()">Export as Text</button>
-
-    <!-- Back Workout 1 -->
-    <div id="back1-workout" class="workout-table active">
-        <h2>Back - Workout 1</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Exercise</th>
-                    <th>Duration/Reps</th>
-                    <th>Sets</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr><td>Scap Pull-Down Primer</td><td>1-2 x 10-15 (submaximal)</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Seated Cable Row (Wide Elbows)</td><td>2-3 x 6-8 (to form failure)</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Narrow-Grip Lat Pulldown</td><td>2-3 x 10-12 (to failure + partials)</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Straight-Arm Pushdown</td><td>2-3 x 8-10 (to eccentric failure)</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>One-and-a-Half Rep Dumbbell Pullover Ladder</td><td>1 x to failure</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Banded/Bodyweight Pull-Up</td><td>1 x to failure (+ partials)</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-            </tbody>
-        </table>
+  <header>
+    <div class="head">
+      <div class="logo">WF</div>
+      <h1>Workout Demo <span class="badge" id="program-badge">Science‑Based (Full Workout)</span></h1>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
+        <label for="program-select" class="muted" style="font-size:12px">Program</label>
+        <select id="program-select" style="padding:8px 10px;border-radius:10px;border:1px solid var(--ring);background:#0f1320;color:var(--text)">
+          <option value="science" selected>Science‑Based (Full Workout)</option>
+          <option value="bbb531">5/3/1 — Boring But Big</option>
+        </select>
+      </div>
     </div>
-
-    <!-- Back Workout 2 -->
-    <div id="back2-workout" class="workout-table">
-        <h2>Back - Workout 2</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Exercise</th>
-                    <th>Duration/Reps</th>
-                    <th>Sets</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr><td>Face Pull (Primer)</td><td>2 x submaximal</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Barbell Row or Chest-Supported Row</td><td>2-3 x 6-8 (to form failure)</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Wide-Grip Pulldown</td><td>2-3 x 10-12 (to failure + partials)</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Dumbbell High Pull</td><td>2-3 x 8-10 (to form failure)</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>One-and-a-Half Rep High Cable Row Ladder</td><td>1 x to failure/arm</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Inverted Row</td><td>1 x to failure (+ partials)</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-            </tbody>
-        </table>
+  </header>
+  <main class="shell">
+    <div class="card" id="program-config"></div>
+    <div class="card" id="program-output"></div>
+    <div class="card" id="diagnostics">
+      <h3 style="margin:0 0 8px">Diagnostics</h3>
+      <p class="muted" style="margin:0 0 6px">Basic smoke tests run on load and after switching programs.</p>
+      <div id="test-results" class="muted"></div>
     </div>
+  </main>
+  <footer>© 2025 — Demo. No tracking, no servers.</footer>
 
-    <!-- Chest Workout 1 -->
-    <div id="chest1-workout" class="workout-table">
-        <h2>Chest - Workout 1</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Exercise</th>
-                    <th>Duration/Reps</th>
-                    <th>Sets</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr><td>Banded External Rotation (Primer)</td><td>1-2 x submaximal</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Incline Dumbbell Bench Press (Thumbs Up)</td><td>3 x 5-8</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Cable Crossover</td><td>3 x 10-12 (to failure + partials)</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Dumbbell Floor Fly (Mechanical Drop Set)</td><td>2-3 x 8-10 (to eccentric failure)</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Deficit One-and-a-Half Rep Push-Up Ladder</td><td>1 x to failure</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Bodyweight Dip</td><td>1 x to failure (+ partials)</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-            </tbody>
-        </table>
-    </div>
+  <script>
+  (function(){
+    const $ = (sel,root=document) => root.querySelector(sel);
+    const el = (tag, attrs={}, html='') => { const n=document.createElement(tag); Object.entries(attrs).forEach(([k,v])=>n.setAttribute(k,v)); if(html) n.innerHTML=html; return n; };
+    const roundTo = (x,b)=> Math.round((+x||0)/(+b||1))*(+b||1);
+    const fmt = (w)=> ((w>0?w:0).toFixed(0))+" lb";
+    function ensureMeta(){ if(!S.meta){ S.meta={ ohp:[{sets:3,reps:10,rpe:8,notes:''},{sets:3,reps:12,rpe:8,notes:''}], dead:[{sets:3,reps:10,rpe:8,notes:''},{sets:3,reps:12,rpe:8,notes:''}], bench:[{sets:3,reps:10,rpe:8,notes:''},{sets:3,reps:12,rpe:8,notes:''}], squat:[{sets:3,reps:10,rpe:8,notes:''},{sets:3,reps:12,rpe:8,notes:''}] }; } }
+    function getAccMeta(day, i){ ensureMeta(); return S.meta[day][i]; }
+    function setAccMeta(day, i, f, v){ ensureMeta(); S.meta[day][i][f]=v; saveState(); }
+    function accStr(day){ ensureMeta(); const names=(S.acc?.[day]||[]); return names.map((n,i)=> n? `${n} (${S.meta[day][i].sets}×${S.meta[day][i].reps} @ RPE${S.meta[day][i].rpe}${S.meta[day][i].notes? ' — '+S.meta[day][i].notes:''})` : '').filter(Boolean).join(' + ');}
 
-    <!-- Chest Workout 2 -->
-    <div id="chest2-workout" class="workout-table">
-        <h2>Chest - Workout 2</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Exercise</th>
-                    <th>Duration/Reps</th>
-                    <th>Sets</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr><td>Band Pull-Apart (Primer)</td><td>1-2 x submaximal</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Dumbbell Bench Press</td><td>3 x 5-8</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>High-to-Low Cable Crossover</td><td>3 x 10-12 (to failure + partials)</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Incline Cable Press</td><td>2-3 x 8-10 (to failure)</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Dip (Stretch Ladder)</td><td>1 x to failure</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Prison Yard Push-Up</td><td>1 x to failure</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-            </tbody>
-        </table>
-    </div>
+    const stateKey='workout_demo_state_v1';
+    const defaultState={ program:'science', tm:{squat:315,bench:225,dead:405,ohp:135}, week:'1', bbbpct:0.6, round:5, acc:{ ohp:['Dips','Lateral Raises'], dead:['Back Extensions','Hanging Leg Raises'], bench:['DB Incline Press','Triceps Pushdowns'], squat:['Leg Press','Walking Lunges'] }, meta:{ ohp:[{sets:3,reps:10,rpe:8,notes:''},{sets:3,reps:12,rpe:8,notes:''}], dead:[{sets:3,reps:10,rpe:8,notes:''},{sets:3,reps:12,rpe:8,notes:''}], bench:[{sets:3,reps:10,rpe:8,notes:''},{sets:3,reps:12,rpe:8,notes:''}], squat:[{sets:3,reps:10,rpe:8,notes:''},{sets:3,reps:12,rpe:8,notes:''}] }, sci:{ scheme:'strength', template:'back1' } };
+    let S = (function(){ try{ return Object.assign({}, defaultState, JSON.parse(localStorage.getItem(stateKey)||'{}')); }catch(_){ return {...defaultState}; } })();
+    function saveState(){ try{ localStorage.setItem(stateKey, JSON.stringify(S)); }catch(_){} }
 
-    <!-- Legs Workout 1 -->
-    <div id="legs1-workout" class="workout-table">
-        <h2>Legs - Workout 1</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Exercise</th>
-                    <th>Duration/Reps</th>
-                    <th>Sets</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr><td>Reverse Hyper (Primer)</td><td>1-2 x 10-15</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Deadlift</td><td>3 x 5</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Barbell Front Squat</td><td>2-3 x 6-8</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Alternating Dumbbell Reverse Lunge</td><td>2-3 x 10/leg (to failure)</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Seated Hamstring Curl or Slick Floor Bridge Curl</td><td>1 x 12-15 (to eccentric failure)</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Standing Calf Raise</td><td>2-3 x to failure</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-            </tbody>
-        </table>
-    </div>
+    const progBadge=$('#program-badge'), config=$('#program-config'), out=$('#program-output'), progSelect=$('#program-select');
 
-    <!-- Legs Workout 2 -->
-    <div id="legs2-workout" class="workout-table">
-        <h2>Legs - Workout 2</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Exercise</th>
-                    <th>Duration/Reps</th>
-                    <th>Sets</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr><td>Banded Overhead Squat (Primer)</td><td>1-2 x 10-15</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Barbell Back Squat</td><td>3 x 7</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Barbell Hip Thrust</td><td>2-3 x 6-8</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Dumbbell Spanish Squat</td><td>2-3 x 10 (to failure)</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Glute-Ham Raise (GHR) or Home GHR Alternative</td><td>1 x to failure (with eccentrics)</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Seated Calf Raise</td><td>2-3 x 10-12 (to failure + partials)</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-            </tbody>
-        </table>
-    </div>
-
-    <!-- Triceps Workout 1 -->
-    <div id="triceps1-workout" class="workout-table">
-        <h2>Triceps - Workout 1</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Exercise</th>
-                    <th>Duration/Reps</th>
-                    <th>Sets</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr><td>Tricep Push Down</td><td>2-3 x 6-8 (to failure)</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Lying Dumbbell Extension</td><td>2-3 x 8-10 (to failure + eccentrics)</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Dumbbell/Cable Tricep Kickback</td><td>2-3 x 10-12 (to failure + partials)</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-                <tr><td>Cobra Push-Up</td><td>1 x to failure</td><td><div class="sets-container"><div class="sets-list"><div class="set"><input type="text" placeholder="Reps" class="reps"><input type="text" placeholder="Weight" class="weight"></div></div><button class="add-set">Add Set</button></div></td></tr>
-            </tbody>
-        </table>
-    </div>
-
-    <!-- Triceps Workout 2 -->
-    <div id="triceps2-workout" class="workout-table">
-        <h2>Triceps - Workout 2</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Exercise</th>
-                    <th>Duration/Reps</th>
-                    <th>Sets</th>
-
-<!-- ========================= 5/3/1 BORING BUT BIG (BBB) MODULE ========================= -->
-<style>
-  .bbb-card{border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:16px;margin:18px 0;backdrop-filter:saturate(1.2) blur(2px)}
-  .bbb-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-  .bbb-grid-4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
-  .bbb-label{font-size:14px;opacity:.9}
-  .bbb-input,.bbb-select{width:100%;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.15);background:#111;color:#fff}
-  .bbb-table{width:100%;border-collapse:collapse;margin-top:12px;font-size:14px}
-  .bbb-table th,.bbb-table td{border-bottom:1px solid rgba(255,255,255,.08);padding:8px 10px;text-align:center}
-  .bbb-help{font-size:12px;opacity:.8;margin-top:6px}
-  .bbb-badge{display:inline-block;border:1px solid rgba(255,255,255,.2);border-radius:999px;padding:2px 8px;font-size:12px;margin-left:6px}
-  @media (max-width:720px){.bbb-grid,.bbb-grid-4{grid-template-columns:1fr} .bbb-table th,.bbb-table td{font-size:13px}}
-</style>
-
-<section id="bbb531" class="bbb-card">
-  <h2>5/3/1 — Boring But Big <span class="bbb-badge">Cycle Builder</span></h2>
-  <p class="bbb-help">
-    Enter your Training Max (TM) for each lift (usually 90% of true 1RM). Pick the week to auto-calc main work and BBB assistance.
-  </p>
-  <div class="bbb-grid-4">
-    <div>
-      <label class="bbb-label">Squat TM (lb)</label>
-      <input id="bbb-squat" class="bbb-input" type="number" min="0" step="5" value="315">
-    </div>
-    <div>
-      <label class="bbb-label">Bench TM (lb)</label>
-      <input id="bbb-bench" class="bbb-input" type="number" min="0" step="5" value="225">
-    </div>
-    <div>
-      <label class="bbb-label">Deadlift TM (lb)</label>
-      <input id="bbb-dead" class="bbb-input" type="number" min="0" step="5" value="405">
-    </div>
-    <div>
-      <label class="bbb-label">Overhead Press TM (lb)</label>
-      <input id="bbb-ohp" class="bbb-input" type="number" min="0" step="5" value="135">
-    </div>
-  </div>
-
-  <div class="bbb-grid" style="margin-top:10px">
-    <div>
-      <label class="bbb-label">Week</label>
-      <select id="bbb-week" class="bbb-select">
-        <option value="1">Week 1 — 65/75/85 × 5+</option>
-        <option value="2">Week 2 — 70/80/90 × 3+</option>
-        <option value="3">Week 3 — 75/85/95 × 1+</option>
-        <option value="4">Week 4 — Deload 40/50/60 × 5</option>
-      </select>
-    </div>
-    <div>
-      <label class="bbb-label">BBB % of TM (5×10)</label>
-      <select id="bbb-bbbpct" class="bbb-select">
-        <option value="0.5">50%</option>
-        <option value="0.6">60%</option>
-        <option value="0.7">70%</option>
-      </select>
-    </div>
-  </div>
-
-  <div style="margin-top:12px">
-    <label class="bbb-label">
-      Round to nearest
-    </label>
-    <select id="bbb-round" class="bbb-select" style="max-width:180px">
-      <option value="1">1 lb</option>
-      <option value="2.5">2.5 lb</option>
-      <option value="5" selected>5 lb</option>
-      <option value="10">10 lb</option>
-    </select>
-  </div>
-
-  <table class="bbb-table" id="bbb-table" aria-label="5/3/1 table">
-    <thead>
-      <tr>
-        <th>Day</th>
-        <th>Lift</th>
-        <th>Set 1</th>
-        <th>Set 2</th>
-        <th>Set 3 (AMRAP)</th>
-        <th>BBB 5×10</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-
-  <p class="bbb-help">
-    Main sets follow the classic percentage progressions for each week. BBB assistance is 5×10 at your chosen percentage. Always warm up appropriately.
-  </p>
-</section>
-
-<script>
-(function(){
-  const weeks = {
-    1: [0.65,0.75,0.85],
-    2: [0.70,0.80,0.90],
-    3: [0.75,0.85,0.95],
-    4: [0.40,0.50,0.60]
-  };
-  const days = [
-    {name:'Day 1', lift:'Overhead Press', key:'ohp'},
-    {name:'Day 2', lift:'Deadlift', key:'dead'},
-    {name:'Day 3', lift:'Bench', key:'bench'},
-    {name:'Day 4', lift:'Squat', key:'squat'}
-  ];
-
-  const $ = id => document.getElementById(id);
-  const tbody = document.querySelector('#bbb-table tbody');
-
-  function roundTo(x, base){
-    base = Number(base)||1;
-    return Math.round(x/base)*base;
-  }
-
-  function fmt(w){ return (w>0? w : 0).toFixed(0) + ' lb'; }
-
-  function getTM(){
-    return {
-      squat: Number($('bbb-squat').value||0),
-      bench: Number($('bbb-bench').value||0),
-      dead:  Number($('bbb-dead').value||0),
-      ohp:   Number($('bbb-ohp').value||0)
+    const SCI_TEMPLATES={
+      back1:{name:'Back - Workout 1',rows:[['Scap Pull-Down Primer','1-2 x 10-15 (submaximal)',''],['Seated Cable Row (Wide Elbows)','2-3 x 6-8 (to form failure)',''],['Narrow-Grip Lat Pulldown','2-3 x 10-12 (to failure + partials)',''],['Straight-Arm Pushdown','2-3 x 8-10 (to eccentric failure)',''],['One-and-a-Half Rep Dumbbell Pullover Ladder','1 x to failure',''],['Banded/Bodyweight Pull-Up','1 x to failure (+ partials)','']]},
+      back2:{name:'Back - Workout 2',rows:[['Face Pull (Primer)','2 x submaximal',''],['Barbell Row or Chest-Supported Row','2-3 x 6-8 (to form failure)',''],['Wide-Grip Pulldown','2-3 x 10-12 (to failure + partials)',''],['Dumbbell High Pull','2-3 x 8-10 (to form failure)',''],['One-and-a-Half Rep High Cable Row Ladder','1 x to failure/arm',''],['Inverted Row','1 x to failure (+ partials)','']]},
+      chest1:{name:'Chest - Workout 1',rows:[['Banded External Rotation (Primer)','1-2 x submaximal',''],['Incline Dumbbell Bench Press (Thumbs Up)','3 x 5-8',''],['Cable Crossover','3 x 10-12 (to failure + partials)',''],['Dumbbell Floor Fly (Mechanical Drop Set)','2-3 x 8-10 (to eccentric failure)',''],['Deficit One-and-a-Half Rep Push-Up Ladder','1 x to failure',''],['Bodyweight Dip','1 x to failure (+ partials)','']]},
+      chest2:{name:'Chest - Workout 2',rows:[['Band Pull-Apart (Primer)','1-2 x submaximal',''],['Dumbbell Bench Press','3 x 5-8',''],['High-to-Low Cable Crossover','3 x 10-12 (to failure + partials)',''],['Incline Cable Press','2-3 x 8-10 (to failure)',''],['Dip (Stretch Ladder)','1 x to failure',''],['Prison Yard Push-Up','1 x to failure','']]},
+      legs1:{name:'Legs - Workout 1',rows:[['Reverse Hyper (Primer)','1-2 x 10-15',''],['Deadlift','3 x 5',''],['Barbell Front Squat','2-3 x 6-8',''],['Alternating Dumbbell Reverse Lunge','2-3 x 10/leg (to failure)',''],['Seated Hamstring Curl or Slick Floor Bridge Curl','1 x 12-15 (to eccentric failure)',''],['Standing Calf Raise','2-3 x to failure','']]},
+      legs2:{name:'Legs - Workout 2',rows:[['Banded Overhead Squat (Primer)','1-2 x 10-15',''],['Barbell Back Squat','3 x 7',''],['Barbell Hip Thrust','2-3 x 6-8',''],['Dumbbell Spanish Squat','2-3 x 10 (to failure)',''],['Glute-Ham Raise (GHR) or Home GHR Alternative','1 x to failure (with eccentrics)',''],['Seated Calf Raise','2-3 x 10-12 (to failure + partials)','']]},
+      triceps1:{name:'Triceps - Workout 1',rows:[['Tricep Push Down','2-3 x 6-8 (to failure)',''],['Lying Dumbbell Extension','2-3 x 8-10 (to failure + eccentrics)',''],['Dumbbell/Cable Tricep Kickback','2-3 x 10-12 (to failure + partials)',''],['Cobra Push-Up','1 x to failure','']]},
+      triceps2:{name:'Triceps - Workout 2',rows:[['(Add movements)','TBD','']]},
+      shoulders1:{name:'Shoulders - Workout 1',rows:[['(Add movements)','TBD','']]},
+      shoulders2:{name:'Shoulders - Workout 2',rows:[['(Add movements)','TBD','']]},
+      shoulders_eff:{name:'Shoulders - Effective Reps',rows:[['Lateral Raise (Dumbbell)','Ignition: 1 x 8-12 to failure; then mini-sets to reach 20 effective reps — use 8-12RM. — Rest guidance included. — See tips column for detailed cadence suggestions.',''],['Overhead Press (Dumbbell)','As Push Press — Ignition set 1 x 8-12 to failure; then 5-7 mini-sets to reach 20 effective reps — prioritize bar speed; slight body English allowed.','']]}
     };
-  }
 
-  function render(){
-    const tm = getTM();
-    const wk = $('bbb-week').value;
-    const bbbpct = Number($('bbb-bbbpct').value||0.5);
-    const rnd = Number($('bbb-round').value||5);
-    const pcts = weeks[wk];
+    function renderScienceConfig(){
+      ensureMeta(); config.innerHTML='';
+      const title=el('h2',{},'Science‑Based (Full Workout)');
+      const p=el('p',{class:'muted'},'Choose a template (Back/Chest/Legs/Shoulders/Triceps), then tweak TMs, rounding, and accessories.');
+      const tplSel=el('select',{});
+      [['back1','Back - Workout 1'],['back2','Back - Workout 2'],['chest1','Chest - Workout 1'],['chest2','Chest - Workout 2'],['legs1','Legs - Workout 1'],['legs2','Legs - Workout 2'],['triceps1','Triceps - Workout 1'],['triceps2','Triceps - Workout 2'],['shoulders1','Shoulders - Workout 1'],['shoulders2','Shoulders - Workout 2'],['shoulders_eff','Shoulders - Effective Reps']].forEach(([v,txt])=>{ const o=el('option',{value:v},txt); if((S.sci?.template||'back1')===v) o.selected=true; tplSel.appendChild(o); });
+      tplSel.addEventListener('input',()=>{ S.sci=S.sci||{}; S.sci.template=tplSel.value; saveState(); renderCurrentProgram(); });
 
-    tbody.innerHTML='';
-    days.forEach(d => {
-      const t = tm[d.key]||0;
-      const s1 = roundTo(t * pcts[0], rnd);
-      const s2 = roundTo(t * pcts[1], rnd);
-      const s3 = roundTo(t * pcts[2], rnd);
-      const bbb = roundTo(t * bbbpct, rnd);
-      const amrap = (wk==='4') ? '×5' : (wk==='1' ? '×5+' : (wk==='2' ? '×3+' : '×1+'));
+      const grid4=el('div',{class:'grid-4'}), tm=S.tm;
+      [['Squat TM (lb)','squat'],['Bench TM (lb)','bench'],['Deadlift TM (lb)','dead'],['Overhead Press TM (lb)','ohp']].forEach(([label,key])=>{
+        const wrap=el('div',{}); wrap.appendChild(el('label',{},label));
+        const inp=el('input',{type:'number',min:'0',step:'5',value:tm[key]}); inp.addEventListener('input',()=>{ S.tm[key]=+inp.value||0; saveState(); renderCurrentProgram(); });
+        wrap.appendChild(inp); grid4.appendChild(wrap);
+      });
 
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${d.name}</td>
-        <td>${d.lift}</td>
-        <td>${fmt(s1)} × ${wk==='4'?'5':'5'}</td>
-        <td>${fmt(s2)} × ${wk==='4'?'5':'5'}</td>
-        <td>${fmt(s3)} ${amrap}</td>
-        <td>${fmt(bbb)} × 10 (5 sets)</td>
-      `;
-      tbody.appendChild(tr);
-    });
+      const roundSel=el('select',{}); [['1','1 lb'],['2.5','2.5 lb'],['5','5 lb'],['10','10 lb']].forEach(([v,txt])=>{ const opt=el('option',{value:v},txt); if(+S.round===+v) opt.selected=true; roundSel.appendChild(opt); });
+      roundSel.addEventListener('input',()=>{ S.round=+roundSel.value; saveState(); renderCurrentProgram(); });
 
-    // Persist simple state
-    try{
-      localStorage.setItem('bbb531_state', JSON.stringify({
-        tm: getTM(), wk, bbbpct, rnd
-      }));
-    }catch(e){}
-  }
+      const topGrid=el('div',{class:'grid',style:'margin-top:12px'});
+      const tplWrap=el('div',{}); tplWrap.appendChild(el('label',{},'Template')); tplWrap.appendChild(tplSel);
+      const roundWrap=el('div',{}); roundWrap.appendChild(el('label',{},'Round to nearest')); roundWrap.appendChild(roundSel);
+      topGrid.appendChild(tplWrap); topGrid.appendChild(roundWrap);
 
-  // Restore
-  try{
-    const saved = JSON.parse(localStorage.getItem('bbb531_state')||'null');
-    if(saved){
-      $('bbb-squat').value = saved.tm.squat;
-      $('bbb-bench').value = saved.tm.bench;
-      $('bbb-dead').value  = saved.tm.dead;
-      $('bbb-ohp').value   = saved.tm.ohp;
-      $('bbb-week').value  = saved.wk;
-      $('bbb-bbbpct').value= saved.bbbpct;
-      $('bbb-round').value = saved.rnd;
+      const accCard=el('div',{}); accCard.appendChild(el('h3',{},'Accessories (sets × reps @ RPE — notes)'));
+      const accLists={ ohp:['Dips','Lateral Raises','Face Pulls','Triceps Pushdowns','Incline DB Press','Push‑ups'], dead:['Back Extensions','Hanging Leg Raises','Hamstring Curls','Barbell Rows','Pull‑ups','Reverse Hypers'], bench:['DB Incline Press','Triceps Pushdowns','Chest Flyes','Push‑ups','CGBP','Face Pulls'], squat:['Leg Press','Walking Lunges','Bulgarian Split Squats','Leg Extensions','Hack Squat','Calf Raises'] };
+      const days=[{label:'Day 1 — Overhead Press',key:'ohp'},{label:'Day 2 — Deadlift',key:'dead'},{label:'Day 3 — Bench',key:'bench'},{label:'Day 4 — Squat',key:'squat'}];
+      function buildRow(d){ const row=el('div',{}); row.appendChild(el('h4',{},d.label)); ['A','B'].forEach((slot,i)=>{ const meta=getAccMeta(d.key,i); const wrap=el('div',{class:'grid',style:'margin:6px 0'}); const sel=el('select',{}); (accLists[d.key]||[]).forEach(name=>{ const o=el('option',{value:name},name); if((S.acc?.[d.key]||[])[i]===name) o.selected=true; sel.appendChild(o); }); sel.addEventListener('input',()=>{ const arr=S.acc[d.key]||['','']; arr[i]=sel.value; S.acc[d.key]=arr; saveState(); renderCurrentProgram(); }); const sets=el('input',{type:'number',min:'1',max:'10',step:'1',value:meta.sets}); sets.addEventListener('input',()=>{ setAccMeta(d.key,i,'sets',+sets.value||0); renderCurrentProgram(); }); const reps=el('input',{type:'number',min:'1',max:'30',step:'1',value:meta.reps}); reps.addEventListener('input',()=>{ setAccMeta(d.key,i,'reps',+reps.value||0); renderCurrentProgram(); }); const rpe=el('input',{type:'number',min:'5',max:'10',step:'0.5',value:meta.rpe}); rpe.addEventListener('input',()=>{ setAccMeta(d.key,i,'rpe',+rpe.value||0); renderCurrentProgram(); }); const notes=el('input',{type:'text',placeholder:'Notes (optional)',value:meta.notes||''}); notes.addEventListener('input',()=>{ setAccMeta(d.key,i,'notes',notes.value); }); const c1=el('div',{}); c1.appendChild(el('label',{},`Accessory ${slot}`)); c1.appendChild(sel); const c2=el('div',{}); c2.appendChild(el('label',{},'Sets')); c2.appendChild(sets); const c3=el('div',{}); c3.appendChild(el('label',{},'Reps')); c3.appendChild(reps); const c4=el('div',{}); c4.appendChild(el('label',{},'RPE')); c4.appendChild(rpe); const c5=el('div',{style:'grid-column:1/-1'}); c5.appendChild(el('label',{},'Notes')); c5.appendChild(notes); wrap.appendChild(c1); wrap.appendChild(c2); wrap.appendChild(c3); wrap.appendChild(c4); wrap.appendChild(c5); row.appendChild(wrap); }); return row; }
+      days.forEach(d=>{ if(!S.acc[d.key]) S.acc[d.key]=['','']; accCard.appendChild(buildRow(d)); });
+
+      const actions=el('div',{style:'display:flex;gap:8px;margin-top:10px;flex-wrap:wrap'});
+      function btn(txt,cb){ const b=el('button',{},txt); b.style.cssText='padding:10px 12px;border-radius:10px;border:1px solid var(--ring);background:#0f1320;color:var(--text);cursor:pointer'; b.addEventListener('click',cb); return b; }
+      function download(name,text){ const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([text],{type:'text/plain'})); a.download=name; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),2000); }
+      actions.appendChild(btn('Save Progress',()=>download('workout-save.json',JSON.stringify(S,null,2))));
+      actions.appendChild(btn('Load Progress',()=>{ const t=prompt('Paste JSON saved from "Save Progress":'); if(!t) return; try{ const obj=JSON.parse(t); S=Object.assign({},S,obj); saveState(); renderCurrentProgram(); }catch(e){ alert('Invalid JSON'); } }));
+      actions.appendChild(btn('Reset',()=>{ S=JSON.parse(JSON.stringify(defaultState)); saveState(); renderCurrentProgram(); }));
+      actions.appendChild(btn('Export as Text',()=>{ const tpl=SCI_TEMPLATES[(S.sci&&S.sci.template)||'back1']; let lines=[`${tpl.name}`,'','Exercise\tDuration/Reps\tSets']; tpl.rows.forEach(r=>lines.push(r.join('\t'))); download('workout.txt',lines.join('\n')); }));
+
+      config.appendChild(title); config.appendChild(p); config.appendChild(tplWrap); config.appendChild(grid4); config.appendChild(topGrid); config.appendChild(accCard); config.appendChild(actions);
     }
-  }catch(e){}
 
-  ['bbb-squat','bbb-bench','bbb-dead','bbb-ohp','bbb-week','bbb-bbbpct','bbb-round']
-    .forEach(id => document.getElementById(id).addEventListener('input', render));
+    function renderScienceOutput(){
+      const tplKey=(S.sci&&S.sci.template)||'back1';
+      const tpl=SCI_TEMPLATES[tplKey]||SCI_TEMPLATES['back1'];
+      const table=el('table',{id:'sci-table','aria-label':'Science-based table'});
+      table.innerHTML=`<thead><tr><th>Exercise</th><th>Duration/Reps</th><th>Sets</th></tr></thead><tbody></tbody>`;
+      const tbody=$('tbody',table);
+      tpl.rows.forEach(([ex,dr,setc])=>{ const tr=el('tr',{},`<td>${ex}</td><td>${dr}</td><td>${setc||''}</td>`); tbody.appendChild(tr); });
+      out.innerHTML=''; out.appendChild(el('h3',{},tpl.name)); out.appendChild(table); out.appendChild(el('p',{class:'muted'},'Template is editable via the accessory section and rounding settings above.'));
+    }
 
-  render();
-})();
-</script>
+    function renderBBBConfig(){
+      const accLists={ ohp:['Dips','Lateral Raises','Face Pulls','Triceps Pushdowns','Incline DB Press','Push‑ups'], dead:['Back Extensions','Hanging Leg Raises','Hamstring Curls','Barbell Rows','Pull‑ups','Reverse Hypers'], bench:['DB Incline Press','Triceps Pushdowns','Chest Flyes','Push‑ups','CGBP','Face Pulls'], squat:['Leg Press','Walking Lunges','Bulgarian Split Squats','Leg Extensions','Hack Squat','Calf Raises'] };
+      ensureMeta(); config.innerHTML='';
+      const title=el('h2',{},'5/3/1 — Boring But Big');
+      const p=el('p',{class:'muted'},'Enter TMs (~90% 1RM), choose week & BBB %, auto‑calculates main sets and 5×10 assistance. Pick accessories + targets for each day.');
+      const grid4=el('div',{class:'grid-4'}), tm=S.tm;
+      [['Squat TM (lb)','squat'],['Bench TM (lb)','bench'],['Deadlift TM (lb)','dead'],['Overhead Press TM (lb)','ohp']].forEach(([label,key])=>{ const wrap=el('div',{}); wrap.appendChild(el('label',{},label)); const inp=el('input',{type:'number',min:'0',step:'5',value:tm[key]}); inp.addEventListener('input',()=>{ S.tm[key]=+inp.value||0; saveState(); renderCurrentProgram(); }); wrap.appendChild(inp); grid4.appendChild(wrap); });
+      const grid=el('div',{class:'grid',style:'margin-top:12px'});
+      const weekSel=el('select',{}); [['1','Week 1 — 65/75/85 × 5+'],['2','Week 2 — 70/80/90 × 3+'],['3','Week 3 — 75/85/95 × 1+'],['4','Week 4 — Deload 40/50/60 × 5']].forEach(([v,txt])=>{ const opt=el('option',{value:v},txt); if(S.week===v) opt.selected=true; weekSel.appendChild(opt); });
+      weekSel.addEventListener('input',()=>{ S.week=weekSel.value; saveState(); renderCurrentProgram(); });
+      const bbbSel=el('select',{}); [['0.5','50%'],['0.6','60%'],['0.7','70%']].forEach(([v,txt])=>{ const opt=el('option',{value:v},txt); if(+S.bbbpct===+v) opt.selected=true; bbbSel.appendChild(opt); });
+      bbbSel.addEventListener('input',()=>{ S.bbbpct=+bbbSel.value; saveState(); renderCurrentProgram(); });
+      const roundSel=el('select',{}); [['1','1 lb'],['2.5','2.5 lb'],['5','5 lb'],['10','10 lb']].forEach(([v,txt])=>{ const opt=el('option',{value:v},txt); if(+S.round===+v) opt.selected=true; roundSel.appendChild(opt); });
+      roundSel.addEventListener('input',()=>{ S.round=+roundSel.value; saveState(); renderCurrentProgram(); });
+      const wWrap=el('div',{}); wWrap.appendChild(el('label',{},'Week')); wWrap.appendChild(weekSel);
+      const bWrap=el('div',{}); bWrap.appendChild(el('label',{},'BBB % of TM (5×10)')); bWrap.appendChild(bbbSel);
+      grid.appendChild(wWrap); grid.appendChild(bWrap);
+      const roundWrap=el('div',{style:'margin-top:12px;max-width:240px'}); roundWrap.appendChild(el('label',{},'Round to nearest')); roundWrap.appendChild(roundSel);
+      const accCard=el('div',{}); accCard.appendChild(el('h3',{},'Accessories (sets × reps @ RPE — notes)'));
+      const days=[{label:'Day 1 — Overhead Press',key:'ohp'},{label:'Day 2 — Deadlift',key:'dead'},{label:'Day 3 — Bench',key:'bench'},{label:'Day 4 — Squat',key:'squat'}];
+      function buildRow(d){ const row=el('div',{}); row.appendChild(el('h4',{},d.label)); ['A','B'].forEach((slot,i)=>{ const meta=getAccMeta(d.key,i); const wrap=el('div',{class:'grid',style:'margin:6px 0'}); const sel=el('select',{}); (accLists[d.key]||[]).forEach(name=>{ const o=el('option',{value:name},name); if((S.acc?.[d.key]||[])[i]===name) o.selected=true; sel.appendChild(o); }); sel.addEventListener('input',()=>{ const arr=S.acc[d.key]||['','']; arr[i]=sel.value; S.acc[d.key]=arr; saveState(); renderCurrentProgram(); }); const sets=el('input',{type:'number',min:'1',max:'10',step:'1',value:meta.sets}); sets.addEventListener('input',()=>{ setAccMeta(d.key,i,'sets',+sets.value||0); renderCurrentProgram(); }); const reps=el('input',{type:'number',min:'1',max:'30',step:'1',value:meta.reps}); reps.addEventListener('input',()=>{ setAccMeta(d.key,i,'reps',+reps.value||0); renderCurrentProgram(); }); const rpe=el('input',{type:'number',min:'5',max:'10',step:'0.5',value:meta.rpe}); rpe.addEventListener('input',()=>{ setAccMeta(d.key,i,'rpe',+rpe.value||0); renderCurrentProgram(); }); const notes=el('input',{type:'text',placeholder:'Notes (optional)',value:meta.notes||''}); notes.addEventListener('input',()=>{ setAccMeta(d.key,i,'notes',notes.value); }); const c1=el('div',{}); c1.appendChild(el('label',{},`Accessory ${slot}`)); c1.appendChild(sel); const c2=el('div',{}); c2.appendChild(el('label',{},'Sets')); c2.appendChild(sets); const c3=el('div',{}); c3.appendChild(el('label',{},'Reps')); c3.appendChild(reps); const c4=el('div',{}); c4.appendChild(el('label',{},'RPE')); c4.appendChild(rpe); const c5=el('div',{style:'grid-column:1/-1'}); c5.appendChild(el('label',{},'Notes')); c5.appendChild(notes); wrap.appendChild(c1); wrap.appendChild(c2); wrap.appendChild(c3); wrap.appendChild(c4); wrap.appendChild(c5); row.appendChild(wrap); }); return row; }
+      days.forEach(d=>{ if(!S.acc[d.key]) S.acc[d.key]=['','']; accCard.appendChild(buildRow(d)); });
+      config.appendChild(title); config.appendChild(p); config.appendChild(grid4); config.appendChild(grid); config.appendChild(roundWrap); config.appendChild(accCard);
+    }
+
+    function renderBBBTable(){
+      const weeks={1:[0.65,0.75,0.85],2:[0.70,0.80,0.90],3:[0.75,0.85,0.95],4:[0.40,0.50,0.60]};
+      const days=[{name:'Day 1',lift:'Overhead Press',key:'ohp'},{name:'Day 2',lift:'Deadlift',key:'dead'},{name:'Day 3',lift:'Bench',key:'bench'},{name:'Day 4',lift:'Squat',key:'squat'}];
+      const tm=S.tm, wk=S.week, p=weeks[wk], bbbpct=+S.bbbpct, rnd=+S.round;
+      const table=el('table',{id:'bbb-table','aria-label':'5/3/1 table'});
+      table.innerHTML=`<thead><tr><th>Day</th><th>Lift</th><th>Set 1</th><th>Set 2</th><th>Set 3 (AMRAP)</th><th>BBB 5×10</th><th>Accessories</th></tr></thead><tbody></tbody>`;
+      const tbody=$('tbody',table);
+      days.forEach(d=>{ const t=tm[d.key]||0; const s1=roundTo(t*p[0],rnd); const s2=roundTo(t*p[1],rnd); const s3=roundTo(t*p[2],rnd); const bbb=roundTo(t*bbbpct,rnd); const amrap=(wk==='4')?'×5':(wk==='1'?'×5+':(wk==='2'?'×3+':'×1+')); const tr=el('tr',{},`<td>${d.name}</td><td>${d.lift}</td><td>${fmt(s1)} × ${wk==='4'?'5':'5'}</td><td>${fmt(s2)} × ${wk==='4'?'5':'5'}</td><td>${fmt(s3)} ${amrap}</td><td>${fmt(bbb)} × 10 (5 sets)</td><td>${accStr(d.key)}</td>`); tbody.appendChild(tr); });
+      out.innerHTML=''; out.appendChild(el('h3',{},'Program Output')); out.appendChild(table); out.appendChild(el('p',{class:'muted'},'Main sets follow classic 5/3/1. BBB is 5×10 at the chosen percentage.'));
+    }
+
+    function runTests(){ const results=[]; function pass(m){results.push(`<span class="chip ok">PASS</span> ${m}`);} function fail(m){results.push(`<span class="chip bad">FAIL</span> ${m}`);} const prev=S.program; try{ S.program='science'; renderCurrentProgram(); if($('#sci-table')||$('#program-output table')) pass('Science output renders a table.'); else fail('Science output table missing'); S.program='bbb531'; renderCurrentProgram(); if($('#bbb-table')) pass('BBB output renders table.'); else fail('BBB output table missing'); const badgeText=$('#program-badge').textContent.toLowerCase(); if(badgeText.includes('boring')||badgeText.includes('science')) pass('Program badge updates.'); else fail('Program badge did not update'); }catch(e){ fail('Tests threw: '+e.message); } S.program=prev; renderCurrentProgram(); $('#test-results').innerHTML=results.map(r=>`<div>${r}</div>`).join(''); }
+
+    const programs={ 'science':{ name:'Science‑Based (Full Workout)', renderConfig:renderScienceConfig, renderOutput:renderScienceOutput }, 'bbb531':{ name:'5/3/1 — Boring But Big', renderConfig:renderBBBConfig, renderOutput:renderBBBTable } };
+
+    function renderCurrentProgram(){ const id=S.program; const prog=programs[id]||programs['bbb531']; progBadge.textContent=prog.name; prog.renderConfig(); prog.renderOutput(); }
+
+    progSelect.value=S.program;
+    progSelect.addEventListener('input',()=>{ S.program=progSelect.value; saveState(); renderCurrentProgram(); runTests(); });
+
+    renderCurrentProgram(); runTests();
+  })();
+  </script>
+  <script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW registration failed:', err));
+    });
+  }
+  </script>
+</body>
+</html>
