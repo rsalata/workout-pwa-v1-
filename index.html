@@ -5,27 +5,92 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Workout Demo — Science‑Based & BBB</title>
   <style>
-    :root{ --bg:#0e1116; --panel:#151926; --card:#1b2132; --text:#e6e9ee; --muted:#aab3c2; --ring:rgba(255,255,255,.08); --acc:#7dd3fc; --yellow:#ffd200; --ok:#22c55e; --bad:#ef4444; }
+    :root{ --bg:#0e1116; --panel:#151926; --card:#1b2132; --text:#e6e9ee; --muted:#aab3c2; --ring:rgba(255,255,255,.08); --acc:#7dd3fc; --yellow:#ffd200; --ok:#22c55e; --bad:#ef4444; --push:#a78bfa; --pull:#38bdf8; --legs:#fb923c; }
     *{box-sizing:border-box}
-    body{margin:0;background:linear-gradient(180deg,#0c1018 0%,#0e1116 100%);color:var(--text);font:500 16px/1.45 system-ui,Segoe UI,Roboto,Inter,Arial}
+    body{margin:0;background:linear-gradient(180deg,#0c1018 0%,#0e1116 100%);color:var(--text);font:500 16px/1.45 system-ui,Segoe UI,Roboto,Inter,Arial;touch-action:pan-y;}
     .shell{max-width:980px;margin:0 auto;padding:28px 18px}
-    header{position:sticky;top:0;background:rgba(14,17,22,.7);backdrop-filter:saturate(1.1) blur(6px);border-bottom:1px solid var(--ring);z-index:10}
+    header{position:sticky;top:0;background:rgba(14,17,22,.95);backdrop-filter:saturate(1.1) blur(8px);border-bottom:1px solid var(--ring);z-index:10}
     .head{max-width:980px;margin:0 auto;display:flex;align-items:center;gap:14px;padding:10px 18px}
     .logo{width:34px;height:34px;border-radius:10px;background:#111;border:1px solid var(--ring);display:grid;place-items:center;font-weight:800}
     h1{font-size:20px;margin:0}
-    .card{background:var(--card);border:1px solid var(--ring);border-radius:16px;padding:18px;margin:18px 0}
+    .card{background:var(--card);border:1px solid var(--ring);border-radius:16px;padding:18px;margin:18px 0;position:relative}
     .muted{color:var(--muted)}
     .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
     .grid-4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
-    label{font-size:13px;color:var(--muted)}
-    input,select{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--ring);background:#0f1320;color:var(--text)}
+    label{font-size:13px;color:var(--muted);display:block;margin-bottom:4px}
+    input,select{width:100%;padding:12px;border-radius:10px;border:1px solid var(--ring);background:#0f1320;color:var(--text);font-size:15px;min-height:44px;transition:border-color .2s}
+    input:focus,select:focus{outline:none;border-color:var(--acc)}
+    input:invalid{border-color:var(--bad)}
     table{width:100%;border-collapse:collapse;margin-top:12px}
-    th,td{padding:10px;border-bottom:1px solid var(--ring);text-align:center}
+    th,td{padding:12px;border-bottom:1px solid var(--ring);text-align:left;font-size:14px}
+    th{color:var(--muted);font-weight:600}
     .badge{display:inline-block;padding:2px 8px;border:1px solid var(--ring);border-radius:999px;font-size:12px;margin-left:8px}
-    .chip{display:inline-block;padding:2px 8px;border-radius:999px;border:1px solid var(--ring);font-size:12px;margin-left:8px}
-    .ok{color:var(--ok);border-color:rgba(34,197,94,.3)} .bad{color:var(--bad);border-color:rgba(239,68,68,.3)}
+    .chip{display:inline-block;padding:3px 10px;border-radius:999px;border:1px solid var(--ring);font-size:12px;margin:2px}
+    .ok{color:var(--ok);border-color:rgba(34,197,94,.3)} 
+    .bad{color:var(--bad);border-color:rgba(239,68,68,.3)}
+    .push{color:var(--push);border-color:rgba(167,139,250,.3)}
+    .pull{color:var(--pull);border-color:rgba(56,189,248,.3)}
+    .legs{color:var(--legs);border-color:rgba(251,146,60,.3)}
+    button{padding:12px 16px;border-radius:10px;border:1px solid var(--ring);background:#0f1320;color:var(--text);cursor:pointer;font:inherit;font-size:14px;font-weight:600;transition:all .2s;min-height:44px}
+    button:hover:not(:disabled){background:#1a2235;border-color:var(--acc);transform:translateY(-1px)}
+    button:active:not(:disabled){transform:translateY(0)}
+    button:disabled{opacity:.5;cursor:not-allowed}
+    .btn-group{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+    .number-input-group{position:relative;display:flex;align-items:stretch}
+    .number-input-group input{border-radius:10px 0 0 10px;padding-right:4px}
+    .number-input-group .stepper{display:flex;flex-direction:column;border:1px solid var(--ring);border-left:none;border-radius:0 10px 10px 0;overflow:hidden}
+    .number-input-group .stepper button{min-height:22px;padding:0 10px;border:none;border-radius:0;background:#0f1320;font-size:12px;line-height:1}
+    .number-input-group .stepper button:hover{background:#1a2235}
+    .number-input-group .stepper button:first-child{border-bottom:1px solid var(--ring)}
+    .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--card);border:1px solid var(--ring);border-radius:12px;padding:16px 24px;box-shadow:0 8px 32px rgba(0,0,0,.4);z-index:1000;opacity:0;transition:all .3s cubic-bezier(0.4,0,0.2,1);max-width:90%;display:flex;align-items:center;gap:12px}
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+    .toast.success{border-left:3px solid var(--ok)}
+    .toast.error{border-left:3px solid var(--bad)}
+    .tooltip{position:relative;display:inline-block;border-bottom:1px dotted var(--muted);cursor:help}
+    .tooltip .tooltiptext{visibility:hidden;width:200px;background:var(--card);color:var(--text);text-align:left;border-radius:8px;padding:8px 12px;position:absolute;z-index:100;bottom:125%;left:50%;margin-left:-100px;opacity:0;transition:opacity .2s;font-size:13px;border:1px solid var(--ring);box-shadow:0 4px 12px rgba(0,0,0,.3)}
+    .tooltip:hover .tooltiptext{visibility:visible;opacity:1}
+    .modal{display:none;position:fixed;z-index:1000;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);animation:fadeIn .2s}
+    .modal.show{display:flex;align-items:center;justify-content:center}
+    .modal-content{background:var(--card);border:1px solid var(--ring);border-radius:16px;padding:24px;max-width:500px;width:90%;max-height:80vh;overflow-y:auto;animation:slideUp .3s}
+    .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+    .modal-close{background:transparent;border:none;font-size:24px;cursor:pointer;padding:4px 8px;color:var(--muted)}
+    .modal-close:hover{color:var(--text)}
+    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+    @keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+    .collapsible{cursor:pointer;user-select:none;display:flex;justify-content:space-between;align-items:center;padding:12px;background:var(--panel);border-radius:10px;margin:8px 0;transition:background .2s}
+    .collapsible:hover{background:#1a2235}
+    .collapsible-content{max-height:0;overflow:hidden;transition:max-height .3s ease-out}
+    .collapsible-content.open{max-height:2000px}
+    .collapsible-arrow{transition:transform .3s;font-size:14px}
+    .collapsible-arrow.open{transform:rotate(180deg)}
+    .status-indicator{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:4px 10px;border-radius:999px;background:var(--panel);border:1px solid var(--ring)}
+    .status-dot{width:6px;height:6px;border-radius:50%;background:var(--ok);animation:pulse 2s infinite}
+    .status-dot.offline{background:var(--bad)}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+    .checkbox-row{display:flex;align-items:center;gap:8px}
+    .checkbox{width:20px;height:20px;cursor:pointer;accent-color:var(--ok)}
+    .completed{opacity:.5;text-decoration:line-through}
+    .progress-bar{width:100%;height:8px;background:var(--panel);border-radius:999px;overflow:hidden;margin:8px 0}
+    .progress-fill{height:100%;background:linear-gradient(90deg,var(--acc),var(--ok));transition:width .3s;border-radius:999px}
+    .timer-display{font-size:48px;font-weight:700;text-align:center;margin:16px 0;font-variant-numeric:tabular-nums}
+    .plate-calc{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+    .plate{padding:4px 12px;border-radius:6px;border:1px solid var(--ring);font-size:13px;font-weight:600}
+    .plate.p45{background:rgba(239,68,68,.2);border-color:var(--bad)}
+    .plate.p25{background:rgba(34,197,94,.2);border-color:var(--ok)}
+    .plate.p10{background:rgba(56,189,248,.2);border-color:var(--pull)}
+    .plate.p5{background:rgba(251,146,60,.2);border-color:var(--legs)}
+    .plate.p2_5{background:rgba(167,139,250,.2);border-color:var(--push)}
+    .rm-calc{font-size:13px;color:var(--muted);margin-top:4px}
+    .swipe-hint{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);padding:8px 16px;background:var(--panel);border:1px solid var(--ring);border-radius:999px;font-size:12px;color:var(--muted);opacity:0;pointer-events:none;transition:opacity .3s}
+    .swipe-hint.show{opacity:1}
     footer{margin:40px 0 20px;color:var(--muted);font-size:13px;text-align:center}
-    @media (max-width:720px){.grid,.grid-4{grid-template-columns:1fr}}
+    @media (max-width:720px){
+      .grid,.grid-4{grid-template-columns:1fr}
+      table{font-size:13px}
+      th,td{padding:10px 6px}
+      .head h1{font-size:16px}
+      .head{flex-wrap:wrap}
+    }
   </style>
   <meta name="theme-color" content="#0e1116">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -35,15 +100,29 @@
   <link rel="manifest" href="./manifest.webmanifest">
 </head>
 <body>
+  <div id="toast" class="toast"></div>
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 style="margin:0" id="modal-title">Modal</h3>
+        <button class="modal-close" onclick="closeModal()">×</button>
+      </div>
+      <div id="modal-body"></div>
+    </div>
+  </div>
   <header>
     <div class="head">
       <div class="logo">WF</div>
-      <h1>Workout Demo <span class="badge" id="program-badge">Science‑Based (Full Workout)</span></h1>
-      <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
-        <label for="program-select" class="muted" style="font-size:12px">Program</label>
-        <select id="program-select" style="padding:8px 10px;border-radius:10px;border:1px solid var(--ring);background:#0f1320;color:var(--text)">
-          <option value="science" selected>Science‑Based (Full Workout)</option>
-          <option value="bbb531">5/3/1 — Boring But Big</option>
+      <h1>Workout Demo <span class="badge" id="program-badge">Science‑Based</span></h1>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <span class="status-indicator">
+          <span class="status-dot" id="status-dot"></span>
+          <span id="status-text">Online</span>
+        </span>
+        <button onclick="openTimerModal()" style="padding:8px 12px;min-height:36px" title="Rest Timer">⏱️</button>
+        <select id="program-select" style="padding:8px 10px;min-height:36px">
+          <option value="science" selected>Science‑Based</option>
+          <option value="bbb531">5/3/1 BBB</option>
         </select>
       </div>
     </div>
@@ -51,143 +130,1013 @@
   <main class="shell">
     <div class="card" id="program-config"></div>
     <div class="card" id="program-output"></div>
-    <div class="card" id="diagnostics">
-      <h3 style="margin:0 0 8px">Diagnostics</h3>
-      <p class="muted" style="margin:0 0 6px">Basic smoke tests run on load and after switching programs.</p>
-      <div id="test-results" class="muted"></div>
+    <div class="card" id="history-section" style="display:none">
+      <h3 style="margin:0 0 12px">Workout History</h3>
+      <div id="history-list" class="muted"></div>
     </div>
   </main>
   <footer>© 2025 — Demo. No tracking, no servers.</footer>
 
-  <script>
-  (function(){
-    const $ = (sel,root=document) => root.querySelector(sel);
-    const el = (tag, attrs={}, html='') => { const n=document.createElement(tag); Object.entries(attrs).forEach(([k,v])=>n.setAttribute(k,v)); if(html) n.innerHTML=html; return n; };
-    const roundTo = (x,b)=> Math.round((+x||0)/(+b||1))*(+b||1);
-    const fmt = (w)=> ((w>0?w:0).toFixed(0))+" lb";
-    function ensureMeta(){ if(!S.meta){ S.meta={ ohp:[{sets:3,reps:10,rpe:8,notes:''},{sets:3,reps:12,rpe:8,notes:''}], dead:[{sets:3,reps:10,rpe:8,notes:''},{sets:3,reps:12,rpe:8,notes:''}], bench:[{sets:3,reps:10,rpe:8,notes:''},{sets:3,reps:12,rpe:8,notes:''}], squat:[{sets:3,reps:10,rpe:8,notes:''},{sets:3,reps:12,rpe:8,notes:''}] }; } }
-    function getAccMeta(day, i){ ensureMeta(); return S.meta[day][i]; }
-    function setAccMeta(day, i, f, v){ ensureMeta(); S.meta[day][i][f]=v; saveState(); }
-    function accStr(day){ ensureMeta(); const names=(S.acc?.[day]||[]); return names.map((n,i)=> n? `${n} (${S.meta[day][i].sets}×${S.meta[day][i].reps} @ RPE${S.meta[day][i].rpe}${S.meta[day][i].notes? ' — '+S.meta[day][i].notes:''})` : '').filter(Boolean).join(' + ');}
+  <script type="module">
+    // ==================== UTILITIES ====================
+    const $ = (sel, root = document) => root.querySelector(sel);
+    const $ = (sel, root = document) => root.querySelectorAll(sel);
+    const el = (tag, attrs = {}, html = '') => {
+      const n = document.createElement(tag);
+      Object.entries(attrs).forEach(([k, v]) => n.setAttribute(k, v));
+      if (html) n.innerHTML = html;
+      return n;
+    };
+    const roundTo = (x, b) => Math.round((+x || 0) / (+b || 1)) * (+b || 1);
+    const fmt = (w) => ((w > 0 ? w : 0).toFixed(0)) + " lb";
 
-    const stateKey='workout_demo_state_v1';
-    const defaultState={ program:'science', tm:{squat:315,bench:225,dead:405,ohp:135}, week:'1', bbbpct:0.6, round:5, acc:{ ohp:['Dips','Lateral Raises'], dead:['Back Extensions','Hanging Leg Raises'], bench:['DB Incline Press','Triceps Pushdowns'], squat:['Leg Press','Walking Lunges'] }, meta:{ ohp:[{sets:3,reps:10,rpe:8,notes:''},{sets:3,reps:12,rpe:8,notes:''}], dead:[{sets:3,reps:10,rpe:8,notes:''},{sets:3,reps:12,rpe:8,notes:''}], bench:[{sets:3,reps:10,rpe:8,notes:''},{sets:3,reps:12,rpe:8,notes:''}], squat:[{sets:3,reps:10,rpe:8,notes:''},{sets:3,reps:12,rpe:8,notes:''}] }, sci:{ scheme:'strength', template:'back1' } };
-    let S = (function(){ try{ return Object.assign({}, defaultState, JSON.parse(localStorage.getItem(stateKey)||'{}')); }catch(_){ return {...defaultState}; } })();
-    function saveState(){ try{ localStorage.setItem(stateKey, JSON.stringify(S)); }catch(_){} }
+    // ==================== TOAST NOTIFICATIONS ====================
+    /**
+     * Show a toast notification
+     * @param {string} message - Message to display
+     * @param {string} type - 'success' or 'error'
+     */
+    function showToast(message, type = 'success') {
+      const toast = $('#toast');
+      toast.textContent = message;
+      toast.className = `toast ${type}`;
+      setTimeout(() => toast.classList.add('show'), 10);
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
 
-    const progBadge=$('#program-badge'), config=$('#program-config'), out=$('#program-output'), progSelect=$('#program-select');
-
-    const SCI_TEMPLATES={
-      back1:{name:'Back - Workout 1',rows:[['Scap Pull-Down Primer','1-2 x 10-15 (submaximal)',''],['Seated Cable Row (Wide Elbows)','2-3 x 6-8 (to form failure)',''],['Narrow-Grip Lat Pulldown','2-3 x 10-12 (to failure + partials)',''],['Straight-Arm Pushdown','2-3 x 8-10 (to eccentric failure)',''],['One-and-a-Half Rep Dumbbell Pullover Ladder','1 x to failure',''],['Banded/Bodyweight Pull-Up','1 x to failure (+ partials)','']]},
-      back2:{name:'Back - Workout 2',rows:[['Face Pull (Primer)','2 x submaximal',''],['Barbell Row or Chest-Supported Row','2-3 x 6-8 (to form failure)',''],['Wide-Grip Pulldown','2-3 x 10-12 (to failure + partials)',''],['Dumbbell High Pull','2-3 x 8-10 (to form failure)',''],['One-and-a-Half Rep High Cable Row Ladder','1 x to failure/arm',''],['Inverted Row','1 x to failure (+ partials)','']]},
-      chest1:{name:'Chest - Workout 1',rows:[['Banded External Rotation (Primer)','1-2 x submaximal',''],['Incline Dumbbell Bench Press (Thumbs Up)','3 x 5-8',''],['Cable Crossover','3 x 10-12 (to failure + partials)',''],['Dumbbell Floor Fly (Mechanical Drop Set)','2-3 x 8-10 (to eccentric failure)',''],['Deficit One-and-a-Half Rep Push-Up Ladder','1 x to failure',''],['Bodyweight Dip','1 x to failure (+ partials)','']]},
-      chest2:{name:'Chest - Workout 2',rows:[['Band Pull-Apart (Primer)','1-2 x submaximal',''],['Dumbbell Bench Press','3 x 5-8',''],['High-to-Low Cable Crossover','3 x 10-12 (to failure + partials)',''],['Incline Cable Press','2-3 x 8-10 (to failure)',''],['Dip (Stretch Ladder)','1 x to failure',''],['Prison Yard Push-Up','1 x to failure','']]},
-      legs1:{name:'Legs - Workout 1',rows:[['Reverse Hyper (Primer)','1-2 x 10-15',''],['Deadlift','3 x 5',''],['Barbell Front Squat','2-3 x 6-8',''],['Alternating Dumbbell Reverse Lunge','2-3 x 10/leg (to failure)',''],['Seated Hamstring Curl or Slick Floor Bridge Curl','1 x 12-15 (to eccentric failure)',''],['Standing Calf Raise','2-3 x to failure','']]},
-      legs2:{name:'Legs - Workout 2',rows:[['Banded Overhead Squat (Primer)','1-2 x 10-15',''],['Barbell Back Squat','3 x 7',''],['Barbell Hip Thrust','2-3 x 6-8',''],['Dumbbell Spanish Squat','2-3 x 10 (to failure)',''],['Glute-Ham Raise (GHR) or Home GHR Alternative','1 x to failure (with eccentrics)',''],['Seated Calf Raise','2-3 x 10-12 (to failure + partials)','']]},
-      triceps1:{name:'Triceps - Workout 1',rows:[['Tricep Push Down','2-3 x 6-8 (to failure)',''],['Lying Dumbbell Extension','2-3 x 8-10 (to failure + eccentrics)',''],['Dumbbell/Cable Tricep Kickback','2-3 x 10-12 (to failure + partials)',''],['Cobra Push-Up','1 x to failure','']]},
-      triceps2:{name:'Triceps - Workout 2',rows:[['(Add movements)','TBD','']]},
-      shoulders1:{name:'Shoulders - Workout 1',rows:[['(Add movements)','TBD','']]},
-      shoulders2:{name:'Shoulders - Workout 2',rows:[['(Add movements)','TBD','']]},
-      shoulders_eff:{name:'Shoulders - Effective Reps',rows:[['Lateral Raise (Dumbbell)','Ignition: 1 x 8-12 to failure; then mini-sets to reach 20 effective reps — use 8-12RM. — Rest guidance included. — See tips column for detailed cadence suggestions.',''],['Overhead Press (Dumbbell)','As Push Press — Ignition set 1 x 8-12 to failure; then 5-7 mini-sets to reach 20 effective reps — prioritize bar speed; slight body English allowed.','']]}
+    // ==================== MODAL MANAGEMENT ====================
+    window.openModal = function(title, bodyHtml) {
+      $('#modal-title').textContent = title;
+      $('#modal-body').innerHTML = bodyHtml;
+      $('#modal').classList.add('show');
     };
 
-    function renderScienceConfig(){
-      ensureMeta(); config.innerHTML='';
-      const title=el('h2',{},'Science‑Based (Full Workout)');
-      const p=el('p',{class:'muted'},'Choose a template (Back/Chest/Legs/Shoulders/Triceps), then tweak TMs, rounding, and accessories.');
-      const tplSel=el('select',{});
-      [['back1','Back - Workout 1'],['back2','Back - Workout 2'],['chest1','Chest - Workout 1'],['chest2','Chest - Workout 2'],['legs1','Legs - Workout 1'],['legs2','Legs - Workout 2'],['triceps1','Triceps - Workout 1'],['triceps2','Triceps - Workout 2'],['shoulders1','Shoulders - Workout 1'],['shoulders2','Shoulders - Workout 2'],['shoulders_eff','Shoulders - Effective Reps']].forEach(([v,txt])=>{ const o=el('option',{value:v},txt); if((S.sci?.template||'back1')===v) o.selected=true; tplSel.appendChild(o); });
-      tplSel.addEventListener('input',()=>{ S.sci=S.sci||{}; S.sci.template=tplSel.value; saveState(); renderCurrentProgram(); });
+    window.closeModal = function() {
+      $('#modal').classList.remove('show');
+    };
 
-      const grid4=el('div',{class:'grid-4'}), tm=S.tm;
-      [['Squat TM (lb)','squat'],['Bench TM (lb)','bench'],['Deadlift TM (lb)','dead'],['Overhead Press TM (lb)','ohp']].forEach(([label,key])=>{
-        const wrap=el('div',{}); wrap.appendChild(el('label',{},label));
-        const inp=el('input',{type:'number',min:'0',step:'5',value:tm[key]}); inp.addEventListener('input',()=>{ S.tm[key]=+inp.value||0; saveState(); renderCurrentProgram(); });
-        wrap.appendChild(inp); grid4.appendChild(wrap);
+    $('#modal').addEventListener('click', (e) => {
+      if (e.target === $('#modal')) closeModal();
+    });
+
+    // ==================== STATE MANAGEMENT ====================
+    const stateKey = 'workout_demo_state_v2';
+    const defaultState = {
+      program: 'science',
+      tm: { squat: 315, bench: 225, dead: 405, ohp: 135 },
+      week: '1',
+      bbbpct: 0.6,
+      round: 5,
+      acc: {
+        ohp: ['Dips', 'Lateral Raises'],
+        dead: ['Back Extensions', 'Hanging Leg Raises'],
+        bench: ['DB Incline Press', 'Triceps Pushdowns'],
+        squat: ['Leg Press', 'Walking Lunges']
+      },
+      meta: {
+        ohp: [{ sets: 3, reps: 10, rpe: 8, notes: '' }, { sets: 3, reps: 12, rpe: 8, notes: '' }],
+        dead: [{ sets: 3, reps: 10, rpe: 8, notes: '' }, { sets: 3, reps: 12, rpe: 8, notes: '' }],
+        bench: [{ sets: 3, reps: 10, rpe: 8, notes: '' }, { sets: 3, reps: 12, rpe: 8, notes: '' }],
+        squat: [{ sets: 3, reps: 10, rpe: 8, notes: '' }, { sets: 3, reps: 12, rpe: 8, notes: '' }]
+      },
+      sci: { scheme: 'strength', template: 'back1' },
+      history: [],
+      completion: {}
+    };
+
+    let S = (() => {
+      try {
+        return Object.assign({}, defaultState, JSON.parse(localStorage.getItem(stateKey) || '{}'));
+      } catch (_) {
+        return { ...defaultState };
+      }
+    })();
+
+    /**
+     * Save state to localStorage
+     */
+    function saveState() {
+      try {
+        localStorage.setItem(stateKey, JSON.stringify(S));
+      } catch (e) {
+        showToast('Failed to save progress', 'error');
+      }
+    }
+
+    function ensureMeta() {
+      if (!S.meta) {
+        S.meta = {
+          ohp: [{ sets: 3, reps: 10, rpe: 8, notes: '' }, { sets: 3, reps: 12, rpe: 8, notes: '' }],
+          dead: [{ sets: 3, reps: 10, rpe: 8, notes: '' }, { sets: 3, reps: 12, rpe: 8, notes: '' }],
+          bench: [{ sets: 3, reps: 10, rpe: 8, notes: '' }, { sets: 3, reps: 12, rpe: 8, notes: '' }],
+          squat: [{ sets: 3, reps: 10, rpe: 8, notes: '' }, { sets: 3, reps: 12, rpe: 8, notes: '' }]
+        };
+      }
+    }
+
+    function getAccMeta(day, i) {
+      ensureMeta();
+      return S.meta[day][i];
+    }
+
+    function setAccMeta(day, i, f, v) {
+      ensureMeta();
+      S.meta[day][i][f] = v;
+      saveState();
+    }
+
+    function accStr(day) {
+      ensureMeta();
+      const names = (S.acc?.[day] || []);
+      return names.map((n, i) =>
+        n ? `${n} (${S.meta[day][i].sets}×${S.meta[day][i].reps} @ RPE${S.meta[day][i].rpe}${S.meta[day][i].notes ? ' — ' + S.meta[day][i].notes : ''})` : ''
+      ).filter(Boolean).join(' + ');
+    }
+
+    // ==================== PLATE CALCULATOR ====================
+    /**
+     * Calculate plates needed for a given weight
+     * @param {number} weight - Total weight in pounds
+     * @returns {string} HTML for plate display
+     */
+    function calculatePlates(weight) {
+      const barWeight = 45;
+      const perSide = (weight - barWeight) / 2;
+      if (perSide <= 0) return '<span class="muted">Bar only (45 lb)</span>';
+      
+      const plates = [
+        { weight: 45, count: 0, class: 'p45' },
+        { weight: 25, count: 0, class: 'p25' },
+        { weight: 10, count: 0, class: 'p10' },
+        { weight: 5, count: 0, class: 'p5' },
+        { weight: 2.5, count: 0, class: 'p2_5' }
+      ];
+      
+      let remaining = perSide;
+      plates.forEach(p => {
+        p.count = Math.floor(remaining / p.weight);
+        remaining -= p.count * p.weight;
+      });
+      
+      const html = plates
+        .filter(p => p.count > 0)
+        .map(p => `<span class="plate ${p.class}">${p.count}×${p.weight} lb</span>`)
+        .join('');
+      
+      return `<div class="plate-calc">${html} <span class="muted">(per side)</span></div>`;
+    }
+
+    // ==================== 1RM CALCULATOR ====================
+    /**
+     * Calculate estimated 1RM from training max
+     * @param {number} tm - Training max (typically 90% of 1RM)
+     * @returns {number} Estimated 1RM
+     */
+    function calculate1RM(tm) {
+      return Math.round(tm / 0.9);
+    }
+
+    // ==================== NUMBER INPUT WITH STEPPERS ====================
+    /**
+     * Create a number input with increment/decrement buttons
+     * @param {Object} config - {value, min, max, step, onChange}
+     * @returns {HTMLElement}
+     */
+    function createNumberInput(config) {
+      const { value, min = 0, max = 9999, step = 5, onChange, label: inputLabel } = config;
+      const wrapper = el('div', { class: 'number-input-group' });
+      
+      const input = el('input', {
+        type: 'number',
+        min: String(min),
+        max: String(max),
+        step: String(step),
+        value: String(value),
+        'aria-label': inputLabel || 'Number input'
+      });
+      
+      const stepper = el('div', { class: 'stepper' });
+      const incBtn = el('button', { type: 'button', 'aria-label': 'Increment' }, '▲');
+      const decBtn = el('button', { type: 'button', 'aria-label': 'Decrement' }, '▼');
+      
+      const update = (newVal) => {
+        const val = Math.max(min, Math.min(max, newVal));
+        input.value = val;
+        if (onChange) onChange(val);
+      };
+      
+      incBtn.addEventListener('click', () => update(parseFloat(input.value) + step));
+      decBtn.addEventListener('click', () => update(parseFloat(input.value) - step));
+      input.addEventListener('input', () => {
+        const val = parseFloat(input.value) || 0;
+        if (val >= min && val <= max && onChange) onChange(val);
+      });
+      
+      // Keyboard shortcuts
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          update(parseFloat(input.value) + step);
+        } else if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          update(parseFloat(input.value) - step);
+        }
+      });
+      
+      stepper.appendChild(incBtn);
+      stepper.appendChild(decBtn);
+      wrapper.appendChild(input);
+      wrapper.appendChild(stepper);
+      
+      return wrapper;
+    }
+
+    // ==================== TOOLTIP HELPER ====================
+    /**
+     * Create a tooltip element
+     * @param {string} text - Visible text
+     * @param {string} tip - Tooltip content
+     * @returns {HTMLElement}
+     */
+    function createTooltip(text, tip) {
+      const span = el('span', { class: 'tooltip' }, text);
+      const tipText = el('span', { class: 'tooltiptext' }, tip);
+      span.appendChild(tipText);
+      return span;
+    }
+
+    // ==================== REST TIMER ====================
+    let timerInterval = null;
+    let timerSeconds = 0;
+
+    window.openTimerModal = function() {
+      const bodyHtml = `
+        <div>
+          <label>Rest Time (seconds)</label>
+          <div style="display:flex;gap:8px;margin:12px 0">
+            <button onclick="setTimer(60)">60s</button>
+            <button onclick="setTimer(90)">90s</button>
+            <button onclick="setTimer(120)">2min</button>
+            <button onclick="setTimer(180)">3min</button>
+            <button onclick="setTimer(300)">5min</button>
+          </div>
+          <div class="timer-display" id="timer-display">0:00</div>
+          <div style="display:flex;gap:8px;justify-content:center">
+            <button onclick="startTimer()" id="timer-start">Start</button>
+            <button onclick="pauseTimer()" id="timer-pause">Pause</button>
+            <button onclick="resetTimer()">Reset</button>
+          </div>
+        </div>
+      `;
+      openModal('Rest Timer', bodyHtml);
+    };
+
+    window.setTimer = function(seconds) {
+      timerSeconds = seconds;
+      updateTimerDisplay();
+    };
+
+    window.startTimer = function() {
+      if (timerInterval) return;
+      if (timerSeconds === 0) timerSeconds = 90;
+      
+      timerInterval = setInterval(() => {
+        timerSeconds--;
+        updateTimerDisplay();
+        
+        if (timerSeconds === 0) {
+          clearInterval(timerInterval);
+          timerInterval = null;
+          if ('vibrate' in navigator) navigator.vibrate([200, 100, 200]);
+          if (Notification.permission === 'granted') {
+            new Notification('Rest Timer Complete!', {
+              body: 'Time to start your next set',
+              icon: './icons/icon-192.png'
+            });
+          }
+          showToast('Rest timer complete!', 'success');
+        }
+      }, 1000);
+    };
+
+    window.pauseTimer = function() {
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+    };
+
+    window.resetTimer = function() {
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+      timerSeconds = 0;
+      updateTimerDisplay();
+    };
+
+    function updateTimerDisplay() {
+      const display = $('#timer-display');
+      if (!display) return;
+      const mins = Math.floor(timerSeconds / 60);
+      const secs = timerSeconds % 60;
+      display.textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    // Request notification permission on load
+    if ('Notification' in window && Notification.permission === 'default') {
+      setTimeout(() => {
+        Notification.requestPermission();
+      }, 5000);
+    }
+
+    // ==================== WORKOUT COMPLETION TRACKING ====================
+    function toggleSetCompletion(programId, exerciseId, setIndex) {
+      const key = `${programId}_${exerciseId}_${setIndex}`;
+      if (!S.completion) S.completion = {};
+      S.completion[key] = !S.completion[key];
+      saveState();
+      renderCurrentProgram();
+    }
+
+    function isSetComplete(programId, exerciseId, setIndex) {
+      const key = `${programId}_${exerciseId}_${setIndex}`;
+      return S.completion?.[key] || false;
+    }
+
+    function getWorkoutProgress(programId) {
+      if (!S.completion) return 0;
+      const keys = Object.keys(S.completion).filter(k => k.startsWith(programId));
+      if (keys.length === 0) return 0;
+      const completed = keys.filter(k => S.completion[k]).length;
+      return Math.round((completed / keys.length) * 100);
+    }
+
+    function saveWorkoutToHistory() {
+      if (!S.history) S.history = [];
+      const today = new Date().toISOString().split('T')[0];
+      const workout = {
+        date: today,
+        program: S.program,
+        week: S.week,
+        tm: { ...S.tm },
+        completion: { ...S.completion }
+      };
+      S.history.unshift(workout);
+      if (S.history.length > 50) S.history = S.history.slice(0, 50);
+      S.completion = {};
+      saveState();
+      showToast('Workout saved to history!', 'success');
+      renderHistory();
+    }
+
+    function renderHistory() {
+      const historySection = $('#history-section');
+      const historyList = $('#history-list');
+      
+      if (!S.history || S.history.length === 0) {
+        historySection.style.display = 'none';
+        return;
+      }
+      
+      historySection.style.display = 'block';
+      historyList.innerHTML = S.history.slice(0, 10).map((w, i) => `
+        <div style="padding:12px;background:var(--panel);border-radius:10px;margin:8px 0">
+          <strong>${w.date}</strong> — ${w.program === 'science' ? 'Science-Based' : '5/3/1 BBB'} Week ${w.week}<br>
+          <span class="muted" style="font-size:12px">
+            Squat: ${w.tm.squat} | Bench: ${w.tm.bench} | Dead: ${w.tm.dead} | OHP: ${w.tm.ohp}
+          </span>
+        </div>
+      `).join('');
+    }
+
+    // ==================== SCIENCE-BASED TEMPLATES ====================
+    const SCI_TEMPLATES = {
+      back1: {
+        name: 'Back - Workout 1',
+        type: 'pull',
+        rows: [
+          ['Scap Pull-Down Primer', '1-2 × 10-15 (submaximal)', ''],
+          ['Seated Cable Row (Wide Elbows)', '2-3 × 6-8 (to form failure)', ''],
+          ['Narrow-Grip Lat Pulldown', '2-3 × 10-12 (to failure + partials)', ''],
+          ['Straight-Arm Pushdown', '2-3 × 8-10 (to eccentric failure)', ''],
+          ['One-and-a-Half Rep DB Pullover Ladder', '1 × to failure', ''],
+          ['Banded/Bodyweight Pull-Up', '1 × to failure (+ partials)', '']
+        ]
+      },
+      back2: {
+        name: 'Back - Workout 2',
+        type: 'pull',
+        rows: [
+          ['Face Pull (Primer)', '2 × submaximal', ''],
+          ['Barbell Row or Chest-Supported Row', '2-3 × 6-8 (to form failure)', ''],
+          ['Wide-Grip Pulldown', '2-3 × 10-12 (to failure + partials)', ''],
+          ['Dumbbell High Pull', '2-3 × 8-10 (to form failure)', ''],
+          ['One-and-a-Half Rep High Cable Row Ladder', '1 × to failure/arm', ''],
+          ['Inverted Row', '1 × to failure (+ partials)', '']
+        ]
+      },
+      chest1: {
+        name: 'Chest - Workout 1',
+        type: 'push',
+        rows: [
+          ['Banded External Rotation (Primer)', '1-2 × submaximal', ''],
+          ['Incline DB Bench Press (Thumbs Up)', '3 × 5-8', ''],
+          ['Cable Crossover', '3 × 10-12 (to failure + partials)', ''],
+          ['DB Floor Fly (Mechanical Drop Set)', '2-3 × 8-10 (to eccentric failure)', ''],
+          ['Deficit One-and-a-Half Rep Push-Up Ladder', '1 × to failure', ''],
+          ['Bodyweight Dip', '1 × to failure (+ partials)', '']
+        ]
+      },
+      chest2: {
+        name: 'Chest - Workout 2',
+        type: 'push',
+        rows: [
+          ['Band Pull-Apart (Primer)', '1-2 × submaximal', ''],
+          ['Dumbbell Bench Press', '3 × 5-8', ''],
+          ['High-to-Low Cable Crossover', '3 × 10-12 (to failure + partials)', ''],
+          ['Incline Cable Press', '2-3 × 8-10 (to failure)', ''],
+          ['Dip (Stretch Ladder)', '1 × to failure', ''],
+          ['Prison Yard Push-Up', '1 × to failure', '']
+        ]
+      },
+      legs1: {
+        name: 'Legs - Workout 1',
+        type: 'legs',
+        rows: [
+          ['Reverse Hyper (Primer)', '1-2 × 10-15', ''],
+          ['Deadlift', '3 × 5', ''],
+          ['Barbell Front Squat', '2-3 × 6-8', ''],
+          ['Alternating DB Reverse Lunge', '2-3 × 10/leg (to failure)', ''],
+          ['Seated Hamstring Curl or Slick Floor Bridge Curl', '1 × 12-15 (to eccentric failure)', ''],
+          ['Standing Calf Raise', '2-3 × to failure', '']
+        ]
+      },
+      legs2: {
+        name: 'Legs - Workout 2',
+        type: 'legs',
+        rows: [
+          ['Banded Overhead Squat (Primer)', '1-2 × 10-15', ''],
+          ['Barbell Back Squat', '3 × 7', ''],
+          ['Barbell Hip Thrust', '2-3 × 6-8', ''],
+          ['Dumbbell Spanish Squat', '2-3 × 10 (to failure)', ''],
+          ['Glute-Ham Raise (GHR) or Home GHR Alternative', '1 × to failure (with eccentrics)', ''],
+          ['Seated Calf Raise', '2-3 × 10-12 (to failure + partials)', '']
+        ]
+      },
+      triceps1: {
+        name: 'Triceps - Workout 1',
+        type: 'push',
+        rows: [
+          ['Tricep Push Down', '2-3 × 6-8 (to failure)', ''],
+          ['Lying Dumbbell Extension', '2-3 × 8-10 (to failure + eccentrics)', ''],
+          ['Dumbbell/Cable Tricep Kickback', '2-3 × 10-12 (to failure + partials)', ''],
+          ['Cobra Push-Up', '1 × to failure', '']
+        ]
+      },
+      triceps2: {
+        name: 'Triceps - Workout 2',
+        type: 'push',
+        rows: [['(Add movements)', 'TBD', '']]
+      },
+      shoulders1: {
+        name: 'Shoulders - Workout 1',
+        type: 'push',
+        rows: [['(Add movements)', 'TBD', '']]
+      },
+      shoulders2: {
+        name: 'Shoulders - Workout 2',
+        type: 'push',
+        rows: [['(Add movements)', 'TBD', '']]
+      },
+      shoulders_eff: {
+        name: 'Shoulders - Effective Reps',
+        type: 'push',
+        rows: [
+          ['Lateral Raise (Dumbbell)', 'Ignition: 1 × 8-12 to failure; then mini-sets to reach 20 effective reps', ''],
+          ['Overhead Press (Dumbbell)', 'As Push Press — Ignition set 1 × 8-12 to failure; then 5-7 mini-sets', '']
+        ]
+      }
+    };
+
+    // ==================== SCIENCE-BASED CONFIG ====================
+    function renderScienceConfig() {
+      ensureMeta();
+      const config = $('#program-config');
+      config.innerHTML = '';
+
+      const title = el('h2', {}, 'Science‑Based (Full Workout)');
+      const p = el('p', { class: 'muted' }, 'Choose a template (Back/Chest/Legs/Shoulders/Triceps), then tweak TMs, rounding, and accessories.');
+
+      const tplSel = el('select', { 'aria-label': 'Workout template' });
+      [
+        ['back1', 'Back - Workout 1'],
+        ['back2', 'Back - Workout 2'],
+        ['chest1', 'Chest - Workout 1'],
+        ['chest2', 'Chest - Workout 2'],
+        ['legs1', 'Legs - Workout 1'],
+        ['legs2', 'Legs - Workout 2'],
+        ['triceps1', 'Triceps - Workout 1'],
+        ['triceps2', 'Triceps - Workout 2'],
+        ['shoulders1', 'Shoulders - Workout 1'],
+        ['shoulders2', 'Shoulders - Workout 2'],
+        ['shoulders_eff', 'Shoulders - Effective Reps']
+      ].forEach(([v, txt]) => {
+        const o = el('option', { value: v }, txt);
+        if ((S.sci?.template || 'back1') === v) o.selected = true;
+        tplSel.appendChild(o);
+      });
+      tplSel.addEventListener('input', () => {
+        S.sci = S.sci || {};
+        S.sci.template = tplSel.value;
+        saveState();
+        renderCurrentProgram();
       });
 
-      const roundSel=el('select',{}); [['1','1 lb'],['2.5','2.5 lb'],['5','5 lb'],['10','10 lb']].forEach(([v,txt])=>{ const opt=el('option',{value:v},txt); if(+S.round===+v) opt.selected=true; roundSel.appendChild(opt); });
-      roundSel.addEventListener('input',()=>{ S.round=+roundSel.value; saveState(); renderCurrentProgram(); });
+      const grid4 = el('div', { class: 'grid-4', style: 'margin-top:12px' });
+      const tm = S.tm;
+      [
+        ['Squat', 'squat'],
+        ['Bench', 'bench'],
+        ['Deadlift', 'dead'],
+        ['Overhead Press', 'ohp']
+      ].forEach(([lbl, key]) => {
+        const wrap = el('div');
+        const labelEl = el('label');
+        labelEl.appendChild(createTooltip(`${lbl} TM (lb)`, 'Training Max: typically 90% of your 1-rep max'));
+        const numInput = createNumberInput({
+          value: tm[key],
+          min: 0,
+          max: 1000,
+          step: 5,
+          label: `${lbl} TM`,
+          onChange: (val) => {
+            S.tm[key] = val;
+            saveState();
+            renderCurrentProgram();
+          }
+        });
+        const rmCalc = el('div', { class: 'rm-calc' }, `Est. 1RM: ${calculate1RM(tm[key])} lb`);
+        wrap.appendChild(labelEl);
+        wrap.appendChild(numInput);
+        wrap.appendChild(rmCalc);
+        grid4.appendChild(wrap);
+      });
 
-      const topGrid=el('div',{class:'grid',style:'margin-top:12px'});
-      const tplWrap=el('div',{}); tplWrap.appendChild(el('label',{},'Template')); tplWrap.appendChild(tplSel);
-      const roundWrap=el('div',{}); roundWrap.appendChild(el('label',{},'Round to nearest')); roundWrap.appendChild(roundSel);
-      topGrid.appendChild(tplWrap); topGrid.appendChild(roundWrap);
+      const topGrid = el('div', { class: 'grid', style: 'margin-top:12px' });
+      const tplWrap = el('div');
+      tplWrap.appendChild(el('label', {}, 'Template'));
+      tplWrap.appendChild(tplSel);
 
-      const accCard=el('div',{}); accCard.appendChild(el('h3',{},'Accessories (sets × reps @ RPE — notes)'));
-      const accLists={ ohp:['Dips','Lateral Raises','Face Pulls','Triceps Pushdowns','Incline DB Press','Push‑ups'], dead:['Back Extensions','Hanging Leg Raises','Hamstring Curls','Barbell Rows','Pull‑ups','Reverse Hypers'], bench:['DB Incline Press','Triceps Pushdowns','Chest Flyes','Push‑ups','CGBP','Face Pulls'], squat:['Leg Press','Walking Lunges','Bulgarian Split Squats','Leg Extensions','Hack Squat','Calf Raises'] };
-      const days=[{label:'Day 1 — Overhead Press',key:'ohp'},{label:'Day 2 — Deadlift',key:'dead'},{label:'Day 3 — Bench',key:'bench'},{label:'Day 4 — Squat',key:'squat'}];
-      function buildRow(d){ const row=el('div',{}); row.appendChild(el('h4',{},d.label)); ['A','B'].forEach((slot,i)=>{ const meta=getAccMeta(d.key,i); const wrap=el('div',{class:'grid',style:'margin:6px 0'}); const sel=el('select',{}); (accLists[d.key]||[]).forEach(name=>{ const o=el('option',{value:name},name); if((S.acc?.[d.key]||[])[i]===name) o.selected=true; sel.appendChild(o); }); sel.addEventListener('input',()=>{ const arr=S.acc[d.key]||['','']; arr[i]=sel.value; S.acc[d.key]=arr; saveState(); renderCurrentProgram(); }); const sets=el('input',{type:'number',min:'1',max:'10',step:'1',value:meta.sets}); sets.addEventListener('input',()=>{ setAccMeta(d.key,i,'sets',+sets.value||0); renderCurrentProgram(); }); const reps=el('input',{type:'number',min:'1',max:'30',step:'1',value:meta.reps}); reps.addEventListener('input',()=>{ setAccMeta(d.key,i,'reps',+reps.value||0); renderCurrentProgram(); }); const rpe=el('input',{type:'number',min:'5',max:'10',step:'0.5',value:meta.rpe}); rpe.addEventListener('input',()=>{ setAccMeta(d.key,i,'rpe',+rpe.value||0); renderCurrentProgram(); }); const notes=el('input',{type:'text',placeholder:'Notes (optional)',value:meta.notes||''}); notes.addEventListener('input',()=>{ setAccMeta(d.key,i,'notes',notes.value); }); const c1=el('div',{}); c1.appendChild(el('label',{},`Accessory ${slot}`)); c1.appendChild(sel); const c2=el('div',{}); c2.appendChild(el('label',{},'Sets')); c2.appendChild(sets); const c3=el('div',{}); c3.appendChild(el('label',{},'Reps')); c3.appendChild(reps); const c4=el('div',{}); c4.appendChild(el('label',{},'RPE')); c4.appendChild(rpe); const c5=el('div',{style:'grid-column:1/-1'}); c5.appendChild(el('label',{},'Notes')); c5.appendChild(notes); wrap.appendChild(c1); wrap.appendChild(c2); wrap.appendChild(c3); wrap.appendChild(c4); wrap.appendChild(c5); row.appendChild(wrap); }); return row; }
-      days.forEach(d=>{ if(!S.acc[d.key]) S.acc[d.key]=['','']; accCard.appendChild(buildRow(d)); });
+      const roundSel = el('select', { 'aria-label': 'Rounding increment' });
+      [['1', '1 lb'], ['2.5', '2.5 lb'], ['5', '5 lb'], ['10', '10 lb']].forEach(([v, txt]) => {
+        const opt = el('option', { value: v }, txt);
+        if (+S.round === +v) opt.selected = true;
+        roundSel.appendChild(opt);
+      });
+      roundSel.addEventListener('input', () => {
+        S.round = +roundSel.value;
+        saveState();
+        renderCurrentProgram();
+      });
 
-      const actions=el('div',{style:'display:flex;gap:8px;margin-top:10px;flex-wrap:wrap'});
-      function btn(txt,cb){ const b=el('button',{},txt); b.style.cssText='padding:10px 12px;border-radius:10px;border:1px solid var(--ring);background:#0f1320;color:var(--text);cursor:pointer'; b.addEventListener('click',cb); return b; }
-      function download(name,text){ const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([text],{type:'text/plain'})); a.download=name; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),2000); }
-      actions.appendChild(btn('Save Progress',()=>download('workout-save.json',JSON.stringify(S,null,2))));
-      actions.appendChild(btn('Load Progress',()=>{ const t=prompt('Paste JSON saved from "Save Progress":'); if(!t) return; try{ const obj=JSON.parse(t); S=Object.assign({},S,obj); saveState(); renderCurrentProgram(); }catch(e){ alert('Invalid JSON'); } }));
-      actions.appendChild(btn('Reset',()=>{ S=JSON.parse(JSON.stringify(defaultState)); saveState(); renderCurrentProgram(); }));
-      actions.appendChild(btn('Export as Text',()=>{ const tpl=SCI_TEMPLATES[(S.sci&&S.sci.template)||'back1']; let lines=[`${tpl.name}`,'','Exercise\tDuration/Reps\tSets']; tpl.rows.forEach(r=>lines.push(r.join('\t'))); download('workout.txt',lines.join('\n')); }));
+      const roundWrap = el('div');
+      roundWrap.appendChild(el('label', {}, 'Round to nearest'));
+      roundWrap.appendChild(roundSel);
+      topGrid.appendChild(tplWrap);
+      topGrid.appendChild(roundWrap);
 
-      config.appendChild(title); config.appendChild(p); config.appendChild(tplWrap); config.appendChild(grid4); config.appendChild(topGrid); config.appendChild(accCard); config.appendChild(actions);
+      // Collapsible accessories section
+      const accCard = el('div', { style: 'margin-top:16px' });
+      const accHeader = el('div', { class: 'collapsible' });
+      accHeader.innerHTML = '<h3 style="margin:0">Accessories Configuration</h3><span class="collapsible-arrow">▼</span>';
+      const accContent = el('div', { class: 'collapsible-content' });
+
+      const accLists = {
+        ohp: ['Dips', 'Lateral Raises', 'Face Pulls', 'Triceps Pushdowns', 'Incline DB Press', 'Push‑ups'],
+        dead: ['Back Extensions', 'Hanging Leg Raises', 'Hamstring Curls', 'Barbell Rows', 'Pull‑ups', 'Reverse Hypers'],
+        bench: ['DB Incline Press', 'Triceps Pushdowns', 'Chest Flyes', 'Push‑ups', 'CGBP', 'Face Pulls'],
+        squat: ['Leg Press', 'Walking Lunges', 'Bulgarian Split Squats', 'Leg Extensions', 'Hack Squat', 'Calf Raises']
+      };
+
+      const days = [
+        { label: 'Day 1 — Overhead Press', key: 'ohp' },
+        { label: 'Day 2 — Deadlift', key: 'dead' },
+        { label: 'Day 3 — Bench', key: 'bench' },
+        { label: 'Day 4 — Squat', key: 'squat' }
+      ];
+
+      function buildRow(d) {
+        const row = el('div', { style: 'margin:16px 0' });
+        row.appendChild(el('h4', {}, d.label));
+        ['A', 'B'].forEach((slot, i) => {
+          const meta = getAccMeta(d.key, i);
+          const wrap = el('div', { class: 'grid', style: 'margin:8px 0' });
+
+          const sel = el('select', { 'aria-label': `Accessory ${slot}` });
+          (accLists[d.key] || []).forEach(name => {
+            const o = el('option', { value: name }, name);
+            if ((S.acc?.[d.key] || [])[i] === name) o.selected = true;
+            sel.appendChild(o);
+          });
+          sel.addEventListener('input', () => {
+            const arr = S.acc[d.key] || ['', ''];
+            arr[i] = sel.value;
+            S.acc[d.key] = arr;
+            saveState();
+            renderCurrentProgram();
+          });
+
+          const sets = createNumberInput({
+            value: meta.sets,
+            min: 1,
+            max: 10,
+            step: 1,
+            label: 'Sets',
+            onChange: (v) => {
+              setAccMeta(d.key, i, 'sets', v);
+              renderCurrentProgram();
+            }
+          });
+
+          const reps = createNumberInput({
+            value: meta.reps,
+            min: 1,
+            max: 30,
+            step: 1,
+            label: 'Reps',
+            onChange: (v) => {
+              setAccMeta(d.key, i, 'reps', v);
+              renderCurrentProgram();
+            }
+          });
+
+          const rpe = createNumberInput({
+            value: meta.rpe,
+            min: 5,
+            max: 10,
+            step: 0.5,
+            label: 'RPE',
+            onChange: (v) => {
+              setAccMeta(d.key, i, 'rpe', v);
+              renderCurrentProgram();
+            }
+          });
+
+          const notes = el('input', {
+            type: 'text',
+            placeholder: 'Notes (optional)',
+            value: meta.notes || '',
+            'aria-label': 'Exercise notes'
+          });
+          notes.addEventListener('input', () => {
+            setAccMeta(d.key, i, 'notes', notes.value);
+          });
+
+          const c1 = el('div');
+          const lbl1 = el('label');
+          lbl1.appendChild(document.createTextNode(`Accessory ${slot}`));
+          c1.appendChild(lbl1);
+          c1.appendChild(sel);
+
+          const c2 = el('div');
+          const lbl2 = el('label');
+          lbl2.appendChild(createTooltip('Sets', 'Number of sets to perform'));
+          c2.appendChild(lbl2);
+          c2.appendChild(sets);
+
+          const c3 = el('div');
+          const lbl3 = el('label');
+          lbl3.appendChild(createTooltip('Reps', 'Target repetitions per set'));
+          c3.appendChild(lbl3);
+          c3.appendChild(reps);
+
+          const c4 = el('div');
+          const lbl4 = el('label');
+          lbl4.appendChild(createTooltip('RPE', 'Rate of Perceived Exertion: 8 = 2 reps in reserve, 9 = 1 rep in reserve, 10 = max effort'));
+          c4.appendChild(lbl4);
+          c4.appendChild(rpe);
+
+          const c5 = el('div', { style: 'grid-column:1/-1' });
+          c5.appendChild(el('label', {}, 'Notes'));
+          c5.appendChild(notes);
+
+          wrap.appendChild(c1);
+          wrap.appendChild(c2);
+          wrap.appendChild(c3);
+          wrap.appendChild(c4);
+          wrap.appendChild(c5);
+          row.appendChild(wrap);
+        });
+        return row;
+      }
+
+      days.forEach(d => {
+        if (!S.acc[d.key]) S.acc[d.key] = ['', ''];
+        accContent.appendChild(buildRow(d));
+      });
+
+      accHeader.addEventListener('click', () => {
+        accContent.classList.toggle('open');
+        accHeader.querySelector('.collapsible-arrow').classList.toggle('open');
+      });
+
+      accCard.appendChild(accHeader);
+      accCard.appendChild(accContent);
+
+      // Action buttons
+      const actions = el('div', { class: 'btn-group' });
+
+      function btn(txt, cb) {
+        const b = el('button', {}, txt);
+        b.addEventListener('click', cb);
+        return b;
+      }
+
+      function download(name, text) {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob([text], { type: 'text/plain' }));
+        a.download = name;
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+      }
+
+      actions.appendChild(btn('💾 Save Progress', () => {
+        download('workout-save.json', JSON.stringify(S, null, 2));
+        showToast('Progress saved to file!', 'success');
+      }));
+
+      actions.appendChild(btn('📂 Load Progress', () => {
+        const input = el('input', { type: 'file', accept: '.json' });
+        input.addEventListener('change', (e) => {
+          const file = e.target.files[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = (ev) => {
+            try {
+              const obj = JSON.parse(ev.target.result);
+              S = Object.assign({}, S, obj);
+              saveState();
+              renderCurrentProgram();
+              showToast('Progress loaded successfully!', 'success');
+              closeModal();
+            } catch (err) {
+              showToast('Invalid file format', 'error');
+            }
+          };
+          reader.readAsText(file);
+        });
+        input.click();
+      }));
+
+      actions.appendChild(btn('🔄 Reset', () => {
+        if (confirm('Are you sure you want to reset all data? This cannot be undone.')) {
+          S = JSON.parse(JSON.stringify(defaultState));
+          saveState();
+          renderCurrentProgram();
+          showToast('All data reset', 'success');
+        }
+      }));
+
+      actions.appendChild(btn('📄 Export as CSV', () => {
+        const weeks = { 1: [0.65, 0.75, 0.85], 2: [0.70, 0.80, 0.90], 3: [0.75, 0.85, 0.95], 4: [0.40, 0.50, 0.60] };
+        const days = [
+          { name: 'Day 1', lift: 'Overhead Press', key: 'ohp' },
+          { name: 'Day 2', lift: 'Deadlift', key: 'dead' },
+          { name: 'Day 3', lift: 'Bench', key: 'bench' },
+          { name: 'Day 4', lift: 'Squat', key: 'squat' }
+        ];
+        const tm = S.tm, wk = S.week, p = weeks[wk], bbbpct = +S.bbbpct, rnd = +S.round;
+        
+        let lines = ['Day,Lift,Set 1,Set 2,Set 3 (AMRAP),BBB 5x10,Accessories'];
+        days.forEach(d => {
+          const t = tm[d.key] || 0;
+          const s1 = roundTo(t * p[0], rnd);
+          const s2 = roundTo(t * p[1], rnd);
+          const s3 = roundTo(t * p[2], rnd);
+          const bbb = roundTo(t * bbbpct, rnd);
+          const amrap = (wk === '4') ? 'x5' : (wk === '1' ? 'x5+' : (wk === '2' ? 'x3+' : 'x1+'));
+          lines.push(`"${d.name}","${d.lift}","${s1} x 5","${s2} x 5","${s3} ${amrap}","${bbb} x 10 (5 sets)","${accStr(d.key)}"`);
+        });
+        download('bbb-workout.csv', lines.join('\n'));
+        showToast('Exported as CSV', 'success');
+      }));
+
+      actions.appendChild(btn('✅ Complete Workout', () => {
+        saveWorkoutToHistory();
+      }));
+
+      config.appendChild(title);
+      config.appendChild(p);
+      config.appendChild(grid4);
+      config.appendChild(grid);
+      config.appendChild(roundWrap);
+      config.appendChild(accCard);
+      config.appendChild(actions);
     }
 
-    function renderScienceOutput(){
-      const tplKey=(S.sci&&S.sci.template)||'back1';
-      const tpl=SCI_TEMPLATES[tplKey]||SCI_TEMPLATES['back1'];
-      const table=el('table',{id:'sci-table','aria-label':'Science-based table'});
-      table.innerHTML=`<thead><tr><th>Exercise</th><th>Duration/Reps</th><th>Sets</th></tr></thead><tbody></tbody>`;
-      const tbody=$('tbody',table);
-      tpl.rows.forEach(([ex,dr,setc])=>{ const tr=el('tr',{},`<td>${ex}</td><td>${dr}</td><td>${setc||''}</td>`); tbody.appendChild(tr); });
-      out.innerHTML=''; out.appendChild(el('h3',{},tpl.name)); out.appendChild(table); out.appendChild(el('p',{class:'muted'},'Template is editable via the accessory section and rounding settings above.'));
+    // ==================== BBB OUTPUT ====================
+    function renderBBBTable() {
+      const weeks = { 1: [0.65, 0.75, 0.85], 2: [0.70, 0.80, 0.90], 3: [0.75, 0.85, 0.95], 4: [0.40, 0.50, 0.60] };
+      const days = [
+        { name: 'Day 1', lift: 'Overhead Press', key: 'ohp', type: 'push' },
+        { name: 'Day 2', lift: 'Deadlift', key: 'dead', type: 'pull' },
+        { name: 'Day 3', lift: 'Bench', key: 'bench', type: 'push' },
+        { name: 'Day 4', lift: 'Squat', key: 'squat', type: 'legs' }
+      ];
+      const tm = S.tm, wk = S.week, p = weeks[wk], bbbpct = +S.bbbpct, rnd = +S.round;
+
+      const out = $('#program-output');
+      const progress = getWorkoutProgress('bbb_' + wk);
+
+      const progressBar = el('div');
+      progressBar.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <h3 style="margin:0">Week ${wk} ${wk === '4' ? '(Deload)' : ''} <span class="chip">5/3/1 BBB</span></h3>
+          <span class="muted">${progress}% complete</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" style="width:${progress}%"></div>
+        </div>
+      `;
+
+      const table = el('table', { id: 'bbb-table', 'aria-label': '5/3/1 table' });
+      table.innerHTML = '<thead><tr><th>✓</th><th>Day</th><th>Lift</th><th>Set 1</th><th>Set 2</th><th>Set 3 (AMRAP)</th><th>BBB 5×10</th><th>Accessories</th></tr></thead><tbody></tbody>';
+      const tbody = $('tbody', table);
+
+      days.forEach((d, dayIdx) => {
+        const t = tm[d.key] || 0;
+        const s1 = roundTo(t * p[0], rnd);
+        const s2 = roundTo(t * p[1], rnd);
+        const s3 = roundTo(t * p[2], rnd);
+        const bbb = roundTo(t * bbbpct, rnd);
+        const amrap = (wk === '4') ? '×5' : (wk === '1' ? '×5+' : (wk === '2' ? '×3+' : '×1+'));
+        
+        const isComplete = isSetComplete('bbb_' + wk, d.lift, dayIdx);
+
+        const tr = el('tr');
+        
+        const checkTd = el('td');
+        const checkbox = el('input', {
+          type: 'checkbox',
+          class: 'checkbox',
+          'aria-label': `Mark ${d.lift} complete`
+        });
+        checkbox.checked = isComplete;
+        checkbox.addEventListener('change', () => {
+          toggleSetCompletion('bbb_' + wk, d.lift, dayIdx);
+        });
+        checkTd.appendChild(checkbox);
+
+        const dayTd = el('td', { class: isComplete ? 'completed' : '' });
+        dayTd.innerHTML = `${d.name} <span class="chip ${d.type}">${d.type}</span>`;
+
+        const liftTd = el('td', { class: isComplete ? 'completed' : '' }, d.lift);
+        
+        const s1Td = el('td', { class: isComplete ? 'completed' : '' });
+        s1Td.innerHTML = `${fmt(s1)} × ${wk === '4' ? '5' : '5'}`;
+        s1Td.appendChild(el('div', { style: 'font-size:11px;margin-top:4px' }, calculatePlates(s1)));
+
+        const s2Td = el('td', { class: isComplete ? 'completed' : '' });
+        s2Td.innerHTML = `${fmt(s2)} × ${wk === '4' ? '5' : '5'}`;
+        s2Td.appendChild(el('div', { style: 'font-size:11px;margin-top:4px' }, calculatePlates(s2)));
+
+        const s3Td = el('td', { class: isComplete ? 'completed' : '' });
+        s3Td.innerHTML = `${fmt(s3)} ${amrap}`;
+        s3Td.appendChild(el('div', { style: 'font-size:11px;margin-top:4px' }, calculatePlates(s3)));
+
+        const bbbTd = el('td', { class: isComplete ? 'completed' : '' });
+        bbbTd.innerHTML = `${fmt(bbb)} × 10 (5 sets)`;
+        bbbTd.appendChild(el('div', { style: 'font-size:11px;margin-top:4px' }, calculatePlates(bbb)));
+
+        const accTd = el('td', { class: isComplete ? 'completed' : '' }, accStr(d.key));
+
+        tr.appendChild(checkTd);
+        tr.appendChild(dayTd);
+        tr.appendChild(liftTd);
+        tr.appendChild(s1Td);
+        tr.appendChild(s2Td);
+        tr.appendChild(s3Td);
+        tr.appendChild(bbbTd);
+        tr.appendChild(accTd);
+        tbody.appendChild(tr);
+      });
+
+      out.innerHTML = '';
+      out.appendChild(progressBar);
+      out.appendChild(table);
+      out.appendChild(el('p', { class: 'muted' }, 'Main sets follow classic 5/3/1. BBB is 5×10 at the chosen percentage. Plates shown per side.'));
     }
 
-    function renderBBBConfig(){
-      const accLists={ ohp:['Dips','Lateral Raises','Face Pulls','Triceps Pushdowns','Incline DB Press','Push‑ups'], dead:['Back Extensions','Hanging Leg Raises','Hamstring Curls','Barbell Rows','Pull‑ups','Reverse Hypers'], bench:['DB Incline Press','Triceps Pushdowns','Chest Flyes','Push‑ups','CGBP','Face Pulls'], squat:['Leg Press','Walking Lunges','Bulgarian Split Squats','Leg Extensions','Hack Squat','Calf Raises'] };
-      ensureMeta(); config.innerHTML='';
-      const title=el('h2',{},'5/3/1 — Boring But Big');
-      const p=el('p',{class:'muted'},'Enter TMs (~90% 1RM), choose week & BBB %, auto‑calculates main sets and 5×10 assistance. Pick accessories + targets for each day.');
-      const grid4=el('div',{class:'grid-4'}), tm=S.tm;
-      [['Squat TM (lb)','squat'],['Bench TM (lb)','bench'],['Deadlift TM (lb)','dead'],['Overhead Press TM (lb)','ohp']].forEach(([label,key])=>{ const wrap=el('div',{}); wrap.appendChild(el('label',{},label)); const inp=el('input',{type:'number',min:'0',step:'5',value:tm[key]}); inp.addEventListener('input',()=>{ S.tm[key]=+inp.value||0; saveState(); renderCurrentProgram(); }); wrap.appendChild(inp); grid4.appendChild(wrap); });
-      const grid=el('div',{class:'grid',style:'margin-top:12px'});
-      const weekSel=el('select',{}); [['1','Week 1 — 65/75/85 × 5+'],['2','Week 2 — 70/80/90 × 3+'],['3','Week 3 — 75/85/95 × 1+'],['4','Week 4 — Deload 40/50/60 × 5']].forEach(([v,txt])=>{ const opt=el('option',{value:v},txt); if(S.week===v) opt.selected=true; weekSel.appendChild(opt); });
-      weekSel.addEventListener('input',()=>{ S.week=weekSel.value; saveState(); renderCurrentProgram(); });
-      const bbbSel=el('select',{}); [['0.5','50%'],['0.6','60%'],['0.7','70%']].forEach(([v,txt])=>{ const opt=el('option',{value:v},txt); if(+S.bbbpct===+v) opt.selected=true; bbbSel.appendChild(opt); });
-      bbbSel.addEventListener('input',()=>{ S.bbbpct=+bbbSel.value; saveState(); renderCurrentProgram(); });
-      const roundSel=el('select',{}); [['1','1 lb'],['2.5','2.5 lb'],['5','5 lb'],['10','10 lb']].forEach(([v,txt])=>{ const opt=el('option',{value:v},txt); if(+S.round===+v) opt.selected=true; roundSel.appendChild(opt); });
-      roundSel.addEventListener('input',()=>{ S.round=+roundSel.value; saveState(); renderCurrentProgram(); });
-      const wWrap=el('div',{}); wWrap.appendChild(el('label',{},'Week')); wWrap.appendChild(weekSel);
-      const bWrap=el('div',{}); bWrap.appendChild(el('label',{},'BBB % of TM (5×10)')); bWrap.appendChild(bbbSel);
-      grid.appendChild(wWrap); grid.appendChild(bWrap);
-      const roundWrap=el('div',{style:'margin-top:12px;max-width:240px'}); roundWrap.appendChild(el('label',{},'Round to nearest')); roundWrap.appendChild(roundSel);
-      const accCard=el('div',{}); accCard.appendChild(el('h3',{},'Accessories (sets × reps @ RPE — notes)'));
-      const days=[{label:'Day 1 — Overhead Press',key:'ohp'},{label:'Day 2 — Deadlift',key:'dead'},{label:'Day 3 — Bench',key:'bench'},{label:'Day 4 — Squat',key:'squat'}];
-      function buildRow(d){ const row=el('div',{}); row.appendChild(el('h4',{},d.label)); ['A','B'].forEach((slot,i)=>{ const meta=getAccMeta(d.key,i); const wrap=el('div',{class:'grid',style:'margin:6px 0'}); const sel=el('select',{}); (accLists[d.key]||[]).forEach(name=>{ const o=el('option',{value:name},name); if((S.acc?.[d.key]||[])[i]===name) o.selected=true; sel.appendChild(o); }); sel.addEventListener('input',()=>{ const arr=S.acc[d.key]||['','']; arr[i]=sel.value; S.acc[d.key]=arr; saveState(); renderCurrentProgram(); }); const sets=el('input',{type:'number',min:'1',max:'10',step:'1',value:meta.sets}); sets.addEventListener('input',()=>{ setAccMeta(d.key,i,'sets',+sets.value||0); renderCurrentProgram(); }); const reps=el('input',{type:'number',min:'1',max:'30',step:'1',value:meta.reps}); reps.addEventListener('input',()=>{ setAccMeta(d.key,i,'reps',+reps.value||0); renderCurrentProgram(); }); const rpe=el('input',{type:'number',min:'5',max:'10',step:'0.5',value:meta.rpe}); rpe.addEventListener('input',()=>{ setAccMeta(d.key,i,'rpe',+rpe.value||0); renderCurrentProgram(); }); const notes=el('input',{type:'text',placeholder:'Notes (optional)',value:meta.notes||''}); notes.addEventListener('input',()=>{ setAccMeta(d.key,i,'notes',notes.value); }); const c1=el('div',{}); c1.appendChild(el('label',{},`Accessory ${slot}`)); c1.appendChild(sel); const c2=el('div',{}); c2.appendChild(el('label',{},'Sets')); c2.appendChild(sets); const c3=el('div',{}); c3.appendChild(el('label',{},'Reps')); c3.appendChild(reps); const c4=el('div',{}); c4.appendChild(el('label',{},'RPE')); c4.appendChild(rpe); const c5=el('div',{style:'grid-column:1/-1'}); c5.appendChild(el('label',{},'Notes')); c5.appendChild(notes); wrap.appendChild(c1); wrap.appendChild(c2); wrap.appendChild(c3); wrap.appendChild(c4); wrap.appendChild(c5); row.appendChild(wrap); }); return row; }
-      days.forEach(d=>{ if(!S.acc[d.key]) S.acc[d.key]=['','']; accCard.appendChild(buildRow(d)); });
-      config.appendChild(title); config.appendChild(p); config.appendChild(grid4); config.appendChild(grid); config.appendChild(roundWrap); config.appendChild(accCard);
+    // ==================== PROGRAM DEFINITIONS ====================
+    const programs = {
+      science: {
+        name: 'Science‑Based (Full Workout)',
+        renderConfig: renderScienceConfig,
+        renderOutput: renderScienceOutput
+      },
+      bbb531: {
+        name: '5/3/1 — Boring But Big',
+        renderConfig: renderBBBConfig,
+        renderOutput: renderBBBTable
+      }
+    };
+
+    // ==================== RENDER CURRENT PROGRAM ====================
+    function renderCurrentProgram() {
+      const id = S.program;
+      const prog = programs[id] || programs['bbb531'];
+      $('#program-badge').textContent = prog.name;
+      prog.renderConfig();
+      prog.renderOutput();
+      renderHistory();
     }
 
-    function renderBBBTable(){
-      const weeks={1:[0.65,0.75,0.85],2:[0.70,0.80,0.90],3:[0.75,0.85,0.95],4:[0.40,0.50,0.60]};
-      const days=[{name:'Day 1',lift:'Overhead Press',key:'ohp'},{name:'Day 2',lift:'Deadlift',key:'dead'},{name:'Day 3',lift:'Bench',key:'bench'},{name:'Day 4',lift:'Squat',key:'squat'}];
-      const tm=S.tm, wk=S.week, p=weeks[wk], bbbpct=+S.bbbpct, rnd=+S.round;
-      const table=el('table',{id:'bbb-table','aria-label':'5/3/1 table'});
-      table.innerHTML=`<thead><tr><th>Day</th><th>Lift</th><th>Set 1</th><th>Set 2</th><th>Set 3 (AMRAP)</th><th>BBB 5×10</th><th>Accessories</th></tr></thead><tbody></tbody>`;
-      const tbody=$('tbody',table);
-      days.forEach(d=>{ const t=tm[d.key]||0; const s1=roundTo(t*p[0],rnd); const s2=roundTo(t*p[1],rnd); const s3=roundTo(t*p[2],rnd); const bbb=roundTo(t*bbbpct,rnd); const amrap=(wk==='4')?'×5':(wk==='1'?'×5+':(wk==='2'?'×3+':'×1+')); const tr=el('tr',{},`<td>${d.name}</td><td>${d.lift}</td><td>${fmt(s1)} × ${wk==='4'?'5':'5'}</td><td>${fmt(s2)} × ${wk==='4'?'5':'5'}</td><td>${fmt(s3)} ${amrap}</td><td>${fmt(bbb)} × 10 (5 sets)</td><td>${accStr(d.key)}</td>`); tbody.appendChild(tr); });
-      out.innerHTML=''; out.appendChild(el('h3',{},'Program Output')); out.appendChild(table); out.appendChild(el('p',{class:'muted'},'Main sets follow classic 5/3/1. BBB is 5×10 at the chosen percentage.'));
+    // ==================== TOUCH GESTURES FOR PROGRAM SWITCHING ====================
+    let touchStartX = 0;
+    let touchEndX = 0;
+    const swipeThreshold = 100;
+
+    document.addEventListener('touchstart', (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+    });
+
+    document.addEventListener('touchend', (e) => {
+      touchEndX = e.changedTouches[0].screenX;
+      handleSwipe();
+    });
+
+    function handleSwipe() {
+      const diff = touchStartX - touchEndX;
+      if (Math.abs(diff) < swipeThreshold) return;
+
+      const programs = ['science', 'bbb531'];
+      const currentIdx = programs.indexOf(S.program);
+
+      if (diff > 0 && currentIdx < programs.length - 1) {
+        // Swipe left - next program
+        S.program = programs[currentIdx + 1];
+      } else if (diff < 0 && currentIdx > 0) {
+        // Swipe right - previous program
+        S.program = programs[currentIdx - 1];
+      } else {
+        return; // No change
+      }
+
+      $('#program-select').value = S.program;
+      saveState();
+      renderCurrentProgram();
+      showToast(`Switched to ${programs[S.program].name}`, 'success');
     }
 
-    function runTests(){ const results=[]; function pass(m){results.push(`<span class="chip ok">PASS</span> ${m}`);} function fail(m){results.push(`<span class="chip bad">FAIL</span> ${m}`);} const prev=S.program; try{ S.program='science'; renderCurrentProgram(); if($('#sci-table')||$('#program-output table')) pass('Science output renders a table.'); else fail('Science output table missing'); S.program='bbb531'; renderCurrentProgram(); if($('#bbb-table')) pass('BBB output renders table.'); else fail('BBB output table missing'); const badgeText=$('#program-badge').textContent.toLowerCase(); if(badgeText.includes('boring')||badgeText.includes('science')) pass('Program badge updates.'); else fail('Program badge did not update'); }catch(e){ fail('Tests threw: '+e.message); } S.program=prev; renderCurrentProgram(); $('#test-results').innerHTML=results.map(r=>`<div>${r}</div>`).join(''); }
+    // Show swipe hint on first load
+    if (!localStorage.getItem('swipe_hint_shown')) {
+      setTimeout(() => {
+        const hint = el('div', { class: 'swipe-hint' }, '← Swipe to switch programs →');
+        document.body.appendChild(hint);
+        setTimeout(() => hint.classList.add('show'), 100);
+        setTimeout(() => {
+          hint.classList.remove('show');
+          setTimeout(() => hint.remove(), 300);
+        }, 3000);
+        localStorage.setItem('swipe_hint_shown', 'true');
+      }, 1000);
+    }
 
-    const programs={ 'science':{ name:'Science‑Based (Full Workout)', renderConfig:renderScienceConfig, renderOutput:renderScienceOutput }, 'bbb531':{ name:'5/3/1 — Boring But Big', renderConfig:renderBBBConfig, renderOutput:renderBBBTable } };
+    // ==================== PROGRAM SELECT HANDLER ====================
+    const progSelect = $('#program-select');
+    progSelect.value = S.program;
+    progSelect.addEventListener('input', () => {
+      S.program = progSelect.value;
+      saveState();
+      renderCurrentProgram();
+    });
 
-    function renderCurrentProgram(){ const id=S.program; const prog=programs[id]||programs['bbb531']; progBadge.textContent=prog.name; prog.renderConfig(); prog.renderOutput(); }
+    // ==================== INITIALIZE ====================
+    renderCurrentProgram();
 
-    progSelect.value=S.program;
-    progSelect.addEventListener('input',()=>{ S.program=progSelect.value; saveState(); renderCurrentProgram(); runTests(); });
-
-    renderCurrentProgram(); runTests();
-  })();
+    // Add keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+      // Ctrl/Cmd + S to save
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault();
+        const json = JSON.stringify(S, null, 2);
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob([json], { type: 'application/json' }));
+        a.download = 'workout-save.json';
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+        showToast('Progress saved!', 'success');
+      }
+      
+      // Ctrl/Cmd + T for timer
+      if ((e.ctrlKey || e.metaKey) && e.key === 't') {
+        e.preventDefault();
+        openTimerModal();
+      }
+    });
   </script>
   <script>
   if ('serviceWorker' in navigator) {
@@ -195,6 +1144,437 @@
       navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW registration failed:', err));
     });
   }
+  
+  // Online/offline status
+  function updateStatus(){
+    const dot = document.getElementById('status-dot');
+    const text = document.getElementById('status-text');
+    if(navigator.onLine){
+      dot.classList.remove('offline');
+      text.textContent = 'Online';
+    } else {
+      dot.classList.add('offline');
+      text.textContent = 'Offline';
+    }
+  }
+  window.addEventListener('online', updateStatus);
+  window.addEventListener('offline', updateStatus);
+  updateStatus();
+  </script>('input', () => {
+            const arr = S.acc[d.key] || ['', ''];
+            arr[i] = sel.value;
+            S.acc[d.key] = arr;
+            saveState();
+            renderCurrentProgram();
+          });
+
+          const sets = createNumberInput({
+            value: meta.sets,
+            min: 1,
+            max: 10,
+            step: 1,
+            label: 'Sets',
+            onChange: (v) => {
+              setAccMeta(d.key, i, 'sets', v);
+              renderCurrentProgram();
+            }
+          });
+
+          const reps = createNumberInput({
+            value: meta.reps,
+            min: 1,
+            max: 30,
+            step: 1,
+            label: 'Reps',
+            onChange: (v) => {
+              setAccMeta(d.key, i, 'reps', v);
+              renderCurrentProgram();
+            }
+          });
+
+          const rpe = createNumberInput({
+            value: meta.rpe,
+            min: 5,
+            max: 10,
+            step: 0.5,
+            label: 'RPE',
+            onChange: (v) => {
+              setAccMeta(d.key, i, 'rpe', v);
+              renderCurrentProgram();
+            }
+          });
+
+          const notes = el('input', {
+            type: 'text',
+            placeholder: 'Notes (optional)',
+            value: meta.notes || '',
+            'aria-label': 'Exercise notes'
+          });
+          notes.addEventListener('input', () => {
+            setAccMeta(d.key, i, 'notes', notes.value);
+          });
+
+          const c1 = el('div');
+          const lbl1 = el('label');
+          lbl1.appendChild(document.createTextNode(`Accessory ${slot}`));
+          c1.appendChild(lbl1);
+          c1.appendChild(sel);
+
+          const c2 = el('div');
+          const lbl2 = el('label');
+          lbl2.appendChild(createTooltip('Sets', 'Number of sets to perform'));
+          c2.appendChild(lbl2);
+          c2.appendChild(sets);
+
+          const c3 = el('div');
+          const lbl3 = el('label');
+          lbl3.appendChild(createTooltip('Reps', 'Target repetitions per set'));
+          c3.appendChild(lbl3);
+          c3.appendChild(reps);
+
+          const c4 = el('div');
+          const lbl4 = el('label');
+          lbl4.appendChild(createTooltip('RPE', 'Rate of Perceived Exertion: 8 = 2 reps in reserve, 9 = 1 rep in reserve, 10 = max effort'));
+          c4.appendChild(lbl4);
+          c4.appendChild(rpe);
+
+          const c5 = el('div', { style: 'grid-column:1/-1' });
+          c5.appendChild(el('label', {}, 'Notes'));
+          c5.appendChild(notes);
+
+          wrap.appendChild(c1);
+          wrap.appendChild(c2);
+          wrap.appendChild(c3);
+          wrap.appendChild(c4);
+          wrap.appendChild(c5);
+          row.appendChild(wrap);
+        });
+        return row;
+      }
+
+      days.forEach(d => {
+        if (!S.acc[d.key]) S.acc[d.key] = ['', ''];
+        accContent.appendChild(buildRow(d));
+      });
+
+      accHeader.addEventListener('click', () => {
+        accContent.classList.toggle('open');
+        accHeader.querySelector('.collapsible-arrow').classList.toggle('open');
+      });
+
+      accCard.appendChild(accHeader);
+      accCard.appendChild(accContent);
+
+      // Action buttons
+      const actions = el('div', { class: 'btn-group' });
+
+      function btn(txt, cb, disabled = false) {
+        const b = el('button', {}, txt);
+        if (disabled) b.disabled = true;
+        b.addEventListener('click', cb);
+        return b;
+      }
+
+      function download(name, text) {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob([text], { type: 'text/plain' }));
+        a.download = name;
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+      }
+
+      actions.appendChild(btn('💾 Save Progress', () => {
+        download('workout-save.json', JSON.stringify(S, null, 2));
+        showToast('Progress saved to file!', 'success');
+      }));
+
+      actions.appendChild(btn('📂 Load Progress', () => {
+        const input = el('input', { type: 'file', accept: '.json' });
+        input.addEventListener('change', (e) => {
+          const file = e.target.files[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = (ev) => {
+            try {
+              const obj = JSON.parse(ev.target.result);
+              S = Object.assign({}, S, obj);
+              saveState();
+              renderCurrentProgram();
+              showToast('Progress loaded successfully!', 'success');
+              closeModal();
+            } catch (err) {
+              showToast('Invalid file format', 'error');
+            }
+          };
+          reader.readAsText(file);
+        });
+        input.click();
+      }));
+
+      actions.appendChild(btn('🔄 Reset', () => {
+        if (confirm('Are you sure you want to reset all data? This cannot be undone.')) {
+          S = JSON.parse(JSON.stringify(defaultState));
+          saveState();
+          renderCurrentProgram();
+          showToast('All data reset', 'success');
+        }
+      }));
+
+      actions.appendChild(btn('📊 Export as Text', () => {
+        const tpl = SCI_TEMPLATES[(S.sci && S.sci.template) || 'back1'];
+        let lines = [`${tpl.name}`, '', 'Exercise\tDuration/Reps\tSets'];
+        tpl.rows.forEach(r => lines.push(r.join('\t')));
+        download('workout.txt', lines.join('\n'));
+        showToast('Exported as text file', 'success');
+      }));
+
+      actions.appendChild(btn('📄 Export as CSV', () => {
+        const tpl = SCI_TEMPLATES[(S.sci && S.sci.template) || 'back1'];
+        let lines = ['Exercise,Duration/Reps,Sets'];
+        tpl.rows.forEach(r => lines.push(r.map(c => `"${c}"`).join(',')));
+        download('workout.csv', lines.join('\n'));
+        showToast('Exported as CSV', 'success');
+      }));
+
+      actions.appendChild(btn('✅ Complete Workout', () => {
+        saveWorkoutToHistory();
+      }));
+
+      config.appendChild(title);
+      config.appendChild(p);
+      config.appendChild(tplWrap);
+      config.appendChild(grid4);
+      config.appendChild(topGrid);
+      config.appendChild(accCard);
+      config.appendChild(actions);
+    }
+
+    // ==================== SCIENCE-BASED OUTPUT ====================
+    function renderScienceOutput() {
+      const tplKey = (S.sci && S.sci.template) || 'back1';
+      const tpl = SCI_TEMPLATES[tplKey] || SCI_TEMPLATES['back1'];
+      const out = $('#program-output');
+
+      const progress = getWorkoutProgress('science_' + tplKey);
+      const progressBar = el('div');
+      progressBar.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <h3 style="margin:0">${tpl.name} <span class="chip ${tpl.type}">${tpl.type.toUpperCase()}</span></h3>
+          <span class="muted">${progress}% complete</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" style="width:${progress}%"></div>
+        </div>
+      `;
+
+      const table = el('table', { id: 'sci-table', 'aria-label': 'Science-based table' });
+      table.innerHTML = '<thead><tr><th>✓</th><th>Exercise</th><th>Duration/Reps</th><th>Sets</th></tr></thead><tbody></tbody>';
+      const tbody = $('tbody', table);
+
+      tpl.rows.forEach(([ex, dr, setc], idx) => {
+        const tr = el('tr');
+        const isComplete = isSetComplete('science_' + tplKey, ex, idx);
+
+        const checkTd = el('td');
+        const checkbox = el('input', {
+          type: 'checkbox',
+          class: 'checkbox',
+          'aria-label': `Mark ${ex} complete`
+        });
+        checkbox.checked = isComplete;
+        checkbox.addEventListener('change', () => {
+          toggleSetCompletion('science_' + tplKey, ex, idx);
+        });
+        checkTd.appendChild(checkbox);
+
+        const exTd = el('td', { class: isComplete ? 'completed' : '' }, ex);
+        const drTd = el('td', { class: isComplete ? 'completed' : '' }, dr);
+        const setTd = el('td', { class: isComplete ? 'completed' : '' }, setc || '');
+
+        tr.appendChild(checkTd);
+        tr.appendChild(exTd);
+        tr.appendChild(drTd);
+        tr.appendChild(setTd);
+        tbody.appendChild(tr);
+      });
+
+      out.innerHTML = '';
+      out.appendChild(progressBar);
+      out.appendChild(table);
+      out.appendChild(el('p', { class: 'muted' }, 'Template is editable via the accessory section and rounding settings above.'));
+    }
+
+    // ==================== BBB CONFIG ====================
+    function renderBBBConfig() {
+      const accLists = {
+        ohp: ['Dips', 'Lateral Raises', 'Face Pulls', 'Triceps Pushdowns', 'Incline DB Press', 'Push‑ups'],
+        dead: ['Back Extensions', 'Hanging Leg Raises', 'Hamstring Curls', 'Barbell Rows', 'Pull‑ups', 'Reverse Hypers'],
+        bench: ['DB Incline Press', 'Triceps Pushdowns', 'Chest Flyes', 'Push‑ups', 'CGBP', 'Face Pulls'],
+        squat: ['Leg Press', 'Walking Lunges', 'Bulgarian Split Squats', 'Leg Extensions', 'Hack Squat', 'Calf Raises']
+      };
+
+      ensureMeta();
+      const config = $('#program-config');
+      config.innerHTML = '';
+
+      const title = el('h2', {}, '5/3/1 — Boring But Big');
+      const p = el('p', { class: 'muted' });
+      p.appendChild(document.createTextNode('Enter '));
+      p.appendChild(createTooltip('TMs', 'Training Max: typically 90% of your 1-rep max'));
+      p.appendChild(document.createTextNode(', choose week & '));
+      p.appendChild(createTooltip('BBB %', 'Boring But Big percentage: 50-60% for beginners, 60-70% for advanced'));
+      p.appendChild(document.createTextNode(', auto‑calculates main sets and 5×10 assistance. Pick accessories + targets for each day.'));
+
+      const grid4 = el('div', { class: 'grid-4' });
+      const tm = S.tm;
+
+      [
+        ['Squat', 'squat'],
+        ['Bench', 'bench'],
+        ['Deadlift', 'dead'],
+        ['Overhead Press', 'ohp']
+      ].forEach(([lbl, key]) => {
+        const wrap = el('div');
+        const labelEl = el('label');
+        labelEl.appendChild(createTooltip(`${lbl} TM (lb)`, 'Training Max: typically 90% of your 1-rep max'));
+
+        const numInput = createNumberInput({
+          value: tm[key],
+          min: 0,
+          max: 1000,
+          step: 5,
+          label: `${lbl} TM`,
+          onChange: (val) => {
+            S.tm[key] = val;
+            saveState();
+            renderCurrentProgram();
+          }
+        });
+
+        const rmCalc = el('div', { class: 'rm-calc' }, `Est. 1RM: ${calculate1RM(tm[key])} lb`);
+        wrap.appendChild(labelEl);
+        wrap.appendChild(numInput);
+        wrap.appendChild(rmCalc);
+        grid4.appendChild(wrap);
+      });
+
+      const grid = el('div', { class: 'grid', style: 'margin-top:12px' });
+
+      const weekSel = el('select', { 'aria-label': 'Training week' });
+      [
+        ['1', 'Week 1 — 65/75/85 × 5+'],
+        ['2', 'Week 2 — 70/80/90 × 3+'],
+        ['3', 'Week 3 — 75/85/95 × 1+'],
+        ['4', 'Week 4 — Deload 40/50/60 × 5']
+      ].forEach(([v, txt]) => {
+        const opt = el('option', { value: v }, txt);
+        if (S.week === v) opt.selected = true;
+        weekSel.appendChild(opt);
+      });
+      weekSel.addEventListener('input', () => {
+        S.week = weekSel.value;
+        saveState();
+        renderCurrentProgram();
+      });
+
+      const bbbSel = el('select', { 'aria-label': 'BBB percentage' });
+      [
+        ['0.5', '50%'],
+        ['0.6', '60%'],
+        ['0.7', '70%']
+      ].forEach(([v, txt]) => {
+        const opt = el('option', { value: v }, txt);
+        if (+S.bbbpct === +v) opt.selected = true;
+        bbbSel.appendChild(opt);
+      });
+      bbbSel.addEventListener('input', () => {
+        S.bbbpct = +bbbSel.value;
+        saveState();
+        renderCurrentProgram();
+      });
+
+      const roundSel = el('select', { 'aria-label': 'Rounding increment' });
+      [
+        ['1', '1 lb'],
+        ['2.5', '2.5 lb'],
+        ['5', '5 lb'],
+        ['10', '10 lb']
+      ].forEach(([v, txt]) => {
+        const opt = el('option', { value: v }, txt);
+        if (+S.round === +v) opt.selected = true;
+        roundSel.appendChild(opt);
+      });
+      roundSel.addEventListener('input', () => {
+        S.round = +roundSel.value;
+        saveState();
+        renderCurrentProgram();
+      });
+
+      const wWrap = el('div');
+      wWrap.appendChild(el('label', {}, 'Week'));
+      wWrap.appendChild(weekSel);
+
+      const bWrap = el('div');
+      bWrap.appendChild(el('label', {}, 'BBB % of TM (5×10)'));
+      bWrap.appendChild(bbbSel);
+
+      grid.appendChild(wWrap);
+      grid.appendChild(bWrap);
+
+      const roundWrap = el('div', { style: 'margin-top:12px;max-width:240px' });
+      roundWrap.appendChild(el('label', {}, 'Round to nearest'));
+      roundWrap.appendChild(roundSel);
+
+      // Collapsible accessories
+      const accCard = el('div', { style: 'margin-top:16px' });
+      const accHeader = el('div', { class: 'collapsible' });
+      accHeader.innerHTML = '<h3 style="margin:0">Accessories Configuration</h3><span class="collapsible-arrow">▼</span>';
+      const accContent = el('div', { class: 'collapsible-content' });
+
+      const days = [
+        { label: 'Day 1 — Overhead Press', key: 'ohp' },
+        { label: 'Day 2 — Deadlift', key: 'dead' },
+        { label: 'Day 3 — Bench', key: 'bench' },
+        { label: 'Day 4 — Squat', key: 'squat' }
+      ];
+
+      function buildRow(d) {
+        const row = el('div', { style: 'margin:16px 0' });
+        row.appendChild(el('h4', {}, d.label));
+
+        ['A', 'B'].forEach((slot, i) => {
+          const meta = getAccMeta(d.key, i);
+          const wrap = el('div', { class: 'grid', style: 'margin:8px 0' });
+
+          const sel = el('select', { 'aria-label': `Accessory ${slot}` });
+          (accLists[d.key] || []).forEach(name => {
+            const o = el('option', { value: name }, name);
+            if ((S.acc?.[d.key] || [])[i] === name) o.selected = true;
+            sel.appendChild(o);
+          });
+          sel.addEventListener
+  <script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW registration failed:', err));
+    });
+  }
+  
+  // Online/offline status
+  function updateStatus(){
+    const dot = document.getElementById('status-dot');
+    const text = document.getElementById('status-text');
+    if(navigator.onLine){
+      dot.classList.remove('offline');
+      text.textContent = 'Online';
+    } else {
+      dot.classList.add('offline');
+      text.textContent = 'Offline';
+    }
+  }
+  window.addEventListener('online', updateStatus);
+  window.addEventListener('offline', updateStatus);
+  updateStatus();
   </script>
 </body>
 </html>
