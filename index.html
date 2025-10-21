@@ -3,198 +3,821 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Workout Demo — Science‑Based & BBB</title>
+  <title>Workout Tracker</title>
   <style>
-    :root{ --bg:#0e1116; --panel:#151926; --card:#1b2132; --text:#e6e9ee; --muted:#aab3c2; --ring:rgba(255,255,255,.08); --acc:#7dd3fc; --yellow:#ffd200; --ok:#22c55e; --bad:#ef4444; }
-    *{box-sizing:border-box}
-    body{margin:0;background:linear-gradient(180deg,#0c1018 0%,#0e1116 100%);color:var(--text);font:500 16px/1.45 system-ui,Segoe UI,Roboto,Inter,Arial}
-    .shell{max-width:980px;margin:0 auto;padding:28px 18px}
-    header{position:sticky;top:0;background:rgba(14,17,22,.7);backdrop-filter:saturate(1.1) blur(6px);border-bottom:1px solid var(--ring);z-index:10}
-    .head{max-width:980px;margin:0 auto;display:flex;align-items:center;gap:14px;padding:10px 18px}
-    .logo{width:34px;height:34px;border-radius:10px;background:#111;border:1px solid var(--ring);display:grid;place-items:center;font-weight:800}
-    h1{font-size:20px;margin:0}
-    .card{background:var(--card);border:1px solid var(--ring);border-radius:16px;padding:18px;margin:18px 0}
-    .muted{color:var(--muted)}
-    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-    .grid-4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
-    label{font-size:13px;color:var(--muted)}
-    input,select{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--ring);background:#0f1320;color:var(--text)}
-    table{width:100%;border-collapse:collapse;margin-top:12px}
-    th,td{padding:10px;border-bottom:1px solid var(--ring);text-align:center}
-    .badge{display:inline-block;padding:2px 8px;border:1px solid var(--ring);border-radius:999px;font-size:12px;margin-left:8px}
-    .chip{display:inline-block;padding:2px 8px;border-radius:999px;border:1px solid var(--ring);font-size:12px;margin-left:8px}
-    .ok{color:var(--ok);border-color:rgba(34,197,94,.3)} .bad{color:var(--bad);border-color:rgba(239,68,68,.3)}
-    footer{margin:40px 0 20px;color:var(--muted);font-size:13px;text-align:center}
-    @media (max-width:720px){.grid,.grid-4{grid-template-columns:1fr}}
+    :root {
+      --bg: #0e1116;
+      --panel: #151926;
+      --card: #1b2132;
+      --text: #e6e9ee;
+      --muted: #aab3c2;
+      --ring: rgba(255,255,255,.08);
+      --accent: #7dd3fc;
+      --success: #22c55e;
+      --warning: #fbbf24;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: linear-gradient(180deg, #0c1018 0%, #0e1116 100%);
+      color: var(--text);
+      font: 500 16px/1.45 system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    header {
+      position: sticky;
+      top: 0;
+      background: rgba(14,17,22,.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--ring);
+      z-index: 100;
+      padding: 16px 20px;
+      margin: 0 -20px 20px;
+    }
+    h1 {
+      font-size: 24px;
+      font-weight: 700;
+      text-align: center;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--ring);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .section-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: var(--accent);
+    }
+    select, input, button {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--ring);
+      background: var(--panel);
+      color: var(--text);
+      font: inherit;
+      font-size: 15px;
+    }
+    select, input {
+      margin-bottom: 12px;
+    }
+    button {
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    button:hover {
+      background: var(--accent);
+      color: var(--bg);
+      border-color: var(--accent);
+    }
+    button:active {
+      transform: scale(0.98);
+    }
+    .timer-buttons {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin: 16px 0;
+    }
+    .timer-buttons button {
+      margin: 0;
+    }
+    .timer-display {
+      font-size: 48px;
+      font-weight: 700;
+      text-align: center;
+      padding: 30px;
+      background: var(--panel);
+      border-radius: 12px;
+      margin: 16px 0;
+      font-variant-numeric: tabular-nums;
+    }
+    .timer-controls {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+    }
+    th {
+      text-align: left;
+      padding: 12px 8px;
+      border-bottom: 2px solid var(--ring);
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--muted);
+    }
+    td {
+      padding: 12px 8px;
+      border-bottom: 1px solid var(--ring);
+    }
+    .exercise-name {
+      font-weight: 600;
+    }
+    .prescribed {
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .log-inputs {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .log-inputs input {
+      margin: 0;
+      flex: 1;
+    }
+    .log-inputs button {
+      margin: 0;
+      flex-shrink: 0;
+      padding: 12px 16px;
+    }
+    .logged-sets {
+      margin-top: 8px;
+      font-size: 14px;
+    }
+    .logged-set {
+      display: inline-block;
+      background: var(--panel);
+      padding: 4px 10px;
+      border-radius: 6px;
+      margin: 2px;
+      border: 1px solid var(--ring);
+    }
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--muted);
+    }
+    .hidden {
+      display: none;
+    }
+    @media (max-width: 768px) {
+      th:nth-child(2), td:nth-child(2) {
+        display: none;
+      }
+    }
   </style>
   <meta name="theme-color" content="#0e1116">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="Workout">
-  <link rel="apple-touch-icon" href="./icon-192.png">
   <link rel="manifest" href="./manifest.webmanifest">
 </head>
 <body>
   <header>
-    <div class="head">
-      <div class="logo">WF</div>
-      <h1>Workout Demo <span class="badge" id="program-badge">Science‑Based (Full Workout)</span></h1>
-      <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
-        <label for="program-select" class="muted" style="font-size:12px">Program</label>
-        <select id="program-select" style="padding:8px 10px;border-radius:10px;border:1px solid var(--ring);background:#0f1320;color:var(--text)">
-          <option value="science" selected>Science‑Based (Full Workout)</option>
-          <option value="bbb531">5/3/1 — Boring But Big</option>
-        </select>
+    <h1>💪 Workout Tracker</h1>
+  </header>
+
+  <div class="container">
+    <!-- Workout Selection -->
+    <div class="card">
+      <label for="workout-select" class="section-title">Select Workout</label>
+      <select id="workout-select">
+        <option value="">-- Choose a workout --</option>
+      </select>
+    </div>
+
+    <!-- Rest Timer -->
+    <div class="card" id="timer-card">
+      <div class="section-title">Rest Timer</div>
+      <div class="timer-buttons">
+        <button onclick="setTimer(30)">30s</button>
+        <button onclick="setTimer(60)">60s</button>
+        <button onclick="setTimer(90)">90s</button>
+      </div>
+      <div class="timer-display" id="timer-display">0:00</div>
+      <div class="timer-controls">
+        <button onclick="startTimer()">Start</button>
+        <button onclick="pauseTimer()">Pause</button>
+        <button onclick="resetTimer()">Reset</button>
       </div>
     </div>
-  </header>
-  <main class="shell">
-    <div class="card" id="program-config"></div>
-    <div class="card" id="program-output"></div>
-    <div class="card" id="diagnostics">
-      <h3 style="margin:0 0 8px">Diagnostics</h3>
-      <p class="muted" style="margin:0 0 6px">Basic smoke tests run on load and after switching programs.</p>
-      <div id="test-results" class="muted"></div>
+
+    <!-- Workout Display -->
+    <div class="card" id="workout-card" style="display: none;">
+      <div class="section-title" id="workout-title"></div>
+      <table id="workout-table">
+        <thead>
+          <tr>
+            <th>Exercise</th>
+            <th>Prescribed</th>
+            <th>Log Sets</th>
+          </tr>
+        </thead>
+        <tbody id="workout-body"></tbody>
+      </table>
     </div>
-  </main>
-  <footer>© 2025 — Demo. No tracking, no servers.</footer>
+
+    <!-- Empty State -->
+    <div class="card empty-state" id="empty-state">
+      <p>👆 Select a workout above to get started</p>
+    </div>
+
+    <!-- Actions -->
+    <div class="card">
+      <button onclick="saveWorkout()" style="margin-bottom: 10px;">💾 Save Progress</button>
+      <button onclick="loadWorkout()" style="margin-bottom: 10px;">📂 Load Progress</button>
+      <button onclick="exportWorkout()">📤 Export as Text</button>
+    </div>
+  </div>
 
   <script>
-  (function(){
-    const $ = (sel,root=document) => root.querySelector(sel);
-    const el = (tag, attrs={}, html='') => { const n=document.createElement(tag); Object.entries(attrs).forEach(([k,v])=>n.setAttribute(k,v)); if(html) n.innerHTML=html; return n; };
-    const roundTo = (x,b)=> Math.round((+x||0)/(+b||1))*(+b||1);
-    const fmt = (w)=> ((w>0?w:0).toFixed(0))+" lb";
-    function ensureMeta(){ if(!S.meta){ S.meta={ ohp:[{sets:3,reps:10,rpe:8,notes:''},{sets:3,reps:12,rpe:8,notes:''}], dead:[{sets:3,reps:10,rpe:8,notes:''},{sets:3,reps:12,rpe:8,notes:''}], bench:[{sets:3,reps:10,rpe:8,notes:''},{sets:3,reps:12,rpe:8,notes:''}], squat:[{sets:3,reps:10,rpe:8,notes:''},{sets:3,reps:12,rpe:8,notes:''}] }; } }
-    function getAccMeta(day, i){ ensureMeta(); return S.meta[day][i]; }
-    function setAccMeta(day, i, f, v){ ensureMeta(); S.meta[day][i][f]=v; saveState(); }
-    function accStr(day){ ensureMeta(); const names=(S.acc?.[day]||[]); return names.map((n,i)=> n? `${n} (${S.meta[day][i].sets}×${S.meta[day][i].reps} @ RPE${S.meta[day][i].rpe}${S.meta[day][i].notes? ' — '+S.meta[day][i].notes:''})` : '').filter(Boolean).join(' + ');}
+    // ============================================
+    // WORKOUT PROGRAMS DATA
+    // ============================================
 
-    const stateKey='workout_demo_state_v1';
-    const defaultState={ program:'science', tm:{squat:315,bench:225,dead:405,ohp:135}, week:'1', bbbpct:0.6, round:5, acc:{ ohp:['Dips','Lateral Raises'], dead:['Back Extensions','Hanging Leg Raises'], bench:['DB Incline Press','Triceps Pushdowns'], squat:['Leg Press','Walking Lunges'] }, meta:{ ohp:[{sets:3,reps:10,rpe:8,notes:''},{sets:3,reps:12,rpe:8,notes:''}], dead:[{sets:3,reps:10,rpe:8,notes:''},{sets:3,reps:12,rpe:8,notes:''}], bench:[{sets:3,reps:10,rpe:8,notes:''},{sets:3,reps:12,rpe:8,notes:''}], squat:[{sets:3,reps:10,rpe:8,notes:''},{sets:3,reps:12,rpe:8,notes:''}] }, sci:{ scheme:'strength', template:'back1' } };
-    let S = (function(){ try{ return Object.assign({}, defaultState, JSON.parse(localStorage.getItem(stateKey)||'{}')); }catch(_){ return {...defaultState}; } })();
-    function saveState(){ try{ localStorage.setItem(stateKey, JSON.stringify(S)); }catch(_){} }
+    const WORKOUTS = {
+      // 5/3/1 BBB Program
+      'bbb-ohp': {
+        name: '5/3/1 BBB - Day 1: Overhead Press',
+        program: 'bbb',
+        exercises: [
+          { name: 'Overhead Press', prescribed: '65% TM × 5', type: 'main' },
+          { name: 'Overhead Press', prescribed: '75% TM × 5', type: 'main' },
+          { name: 'Overhead Press', prescribed: '85% TM × 5+ (AMRAP)', type: 'main' },
+          { name: 'Overhead Press (BBB)', prescribed: '50% TM × 10 (5 sets)', type: 'bbb' },
+          { name: 'Dips', prescribed: '3 × 10', type: 'accessory' },
+          { name: 'Lateral Raises', prescribed: '3 × 12', type: 'accessory' }
+        ]
+      },
+      'bbb-dead': {
+        name: '5/3/1 BBB - Day 2: Deadlift',
+        program: 'bbb',
+        exercises: [
+          { name: 'Deadlift', prescribed: '65% TM × 5', type: 'main' },
+          { name: 'Deadlift', prescribed: '75% TM × 5', type: 'main' },
+          { name: 'Deadlift', prescribed: '85% TM × 5+ (AMRAP)', type: 'main' },
+          { name: 'Deadlift (BBB)', prescribed: '50% TM × 10 (5 sets)', type: 'bbb' },
+          { name: 'Back Extensions', prescribed: '3 × 10', type: 'accessory' },
+          { name: 'Hanging Leg Raises', prescribed: '3 × 12', type: 'accessory' }
+        ]
+      },
+      'bbb-bench': {
+        name: '5/3/1 BBB - Day 3: Bench Press',
+        program: 'bbb',
+        exercises: [
+          { name: 'Bench Press', prescribed: '65% TM × 5', type: 'main' },
+          { name: 'Bench Press', prescribed: '75% TM × 5', type: 'main' },
+          { name: 'Bench Press', prescribed: '85% TM × 5+ (AMRAP)', type: 'main' },
+          { name: 'Bench Press (BBB)', prescribed: '50% TM × 10 (5 sets)', type: 'bbb' },
+          { name: 'DB Incline Press', prescribed: '3 × 10', type: 'accessory' },
+          { name: 'Triceps Pushdowns', prescribed: '3 × 12', type: 'accessory' }
+        ]
+      },
+      'bbb-squat': {
+        name: '5/3/1 BBB - Day 4: Squat',
+        program: 'bbb',
+        exercises: [
+          { name: 'Squat', prescribed: '65% TM × 5', type: 'main' },
+          { name: 'Squat', prescribed: '75% TM × 5', type: 'main' },
+          { name: 'Squat', prescribed: '85% TM × 5+ (AMRAP)', type: 'main' },
+          { name: 'Squat (BBB)', prescribed: '50% TM × 10 (5 sets)', type: 'bbb' },
+          { name: 'Leg Press', prescribed: '3 × 10', type: 'accessory' },
+          { name: 'Walking Lunges', prescribed: '3 × 12/leg', type: 'accessory' }
+        ]
+      },
 
-    const progBadge=$('#program-badge'), config=$('#program-config'), out=$('#program-output'), progSelect=$('#program-select');
+      // Science-Based Program
+      'sci-back1': {
+        name: 'Science-Based - Back Workout 1',
+        program: 'science',
+        exercises: [
+          { name: 'Scap Pull-Down Primer', prescribed: '1-2 × 10-15 (submaximal)' },
+          { name: 'Seated Cable Row (Wide Elbows)', prescribed: '2-3 × 6-8 (to form failure)' },
+          { name: 'Narrow-Grip Lat Pulldown', prescribed: '2-3 × 10-12 (to failure + partials)' },
+          { name: 'Straight-Arm Pushdown', prescribed: '2-3 × 8-10 (to eccentric failure)' },
+          { name: 'One-and-a-Half Rep DB Pullover Ladder', prescribed: '1 × to failure' },
+          { name: 'Banded/Bodyweight Pull-Up', prescribed: '1 × to failure (+ partials)' }
+        ]
+      },
+      'sci-back2': {
+        name: 'Science-Based - Back Workout 2',
+        program: 'science',
+        exercises: [
+          { name: 'Face Pull (Primer)', prescribed: '2 × submaximal' },
+          { name: 'Barbell Row or Chest-Supported Row', prescribed: '2-3 × 6-8 (to form failure)' },
+          { name: 'Wide-Grip Pulldown', prescribed: '2-3 × 10-12 (to failure + partials)' },
+          { name: 'Dumbbell High Pull', prescribed: '2-3 × 8-10 (to form failure)' },
+          { name: 'One-and-a-Half Rep High Cable Row Ladder', prescribed: '1 × to failure/arm' },
+          { name: 'Inverted Row', prescribed: '1 × to failure (+ partials)' }
+        ]
+      },
+      'sci-chest1': {
+        name: 'Science-Based - Chest Workout 1',
+        program: 'science',
+        exercises: [
+          { name: 'Banded External Rotation (Primer)', prescribed: '1-2 × submaximal' },
+          { name: 'Incline DB Bench Press (Thumbs Up)', prescribed: '3 × 5-8' },
+          { name: 'Cable Crossover', prescribed: '3 × 10-12 (to failure + partials)' },
+          { name: 'DB Floor Fly (Mechanical Drop Set)', prescribed: '2-3 × 8-10 (to eccentric failure)' },
+          { name: 'Deficit One-and-a-Half Rep Push-Up Ladder', prescribed: '1 × to failure' },
+          { name: 'Bodyweight Dip', prescribed: '1 × to failure (+ partials)' }
+        ]
+      },
+      'sci-chest2': {
+        name: 'Science-Based - Chest Workout 2',
+        program: 'science',
+        exercises: [
+          { name: 'Band Pull-Apart (Primer)', prescribed: '1-2 × submaximal' },
+          { name: 'Dumbbell Bench Press', prescribed: '3 × 5-8' },
+          { name: 'High-to-Low Cable Crossover', prescribed: '3 × 10-12 (to failure + partials)' },
+          { name: 'Incline Cable Press', prescribed: '2-3 × 8-10 (to failure)' },
+          { name: 'Dip (Stretch Ladder)', prescribed: '1 × to failure' },
+          { name: 'Prison Yard Push-Up', prescribed: '1 × to failure' }
+        ]
+      },
+      'sci-legs1': {
+        name: 'Science-Based - Legs Workout 1',
+        program: 'science',
+        exercises: [
+          { name: 'Reverse Hyper (Primer)', prescribed: '1-2 × 10-15' },
+          { name: 'Deadlift', prescribed: '3 × 5' },
+          { name: 'Barbell Front Squat', prescribed: '2-3 × 6-8' },
+          { name: 'Alternating DB Reverse Lunge', prescribed: '2-3 × 10/leg (to failure)' },
+          { name: 'Seated Hamstring Curl', prescribed: '1 × 12-15 (to eccentric failure)' },
+          { name: 'Standing Calf Raise', prescribed: '2-3 × to failure' }
+        ]
+      },
+      'sci-legs2': {
+        name: 'Science-Based - Legs Workout 2',
+        program: 'science',
+        exercises: [
+          { name: 'Banded Overhead Squat (Primer)', prescribed: '1-2 × 10-15' },
+          { name: 'Barbell Back Squat', prescribed: '3 × 7' },
+          { name: 'Barbell Hip Thrust', prescribed: '2-3 × 6-8' },
+          { name: 'Dumbbell Spanish Squat', prescribed: '2-3 × 10 (to failure)' },
+          { name: 'Glute-Ham Raise (GHR)', prescribed: '1 × to failure (with eccentrics)' },
+          { name: 'Seated Calf Raise', prescribed: '2-3 × 10-12 (to failure + partials)' }
+        ]
+      },
+      'sci-triceps1': {
+        name: 'Science-Based - Triceps Workout 1',
+        program: 'science',
+        exercises: [
+          { name: 'Tricep Push Down', prescribed: '2-3 × 6-8 (to failure)' },
+          { name: 'Lying Dumbbell Extension', prescribed: '2-3 × 8-10 (to failure + eccentrics)' },
+          { name: 'Dumbbell/Cable Tricep Kickback', prescribed: '2-3 × 10-12 (to failure + partials)' },
+          { name: 'Cobra Push-Up', prescribed: '1 × to failure' }
+        ]
+      },
+      'sci-shoulders1': {
+        name: 'Science-Based - Shoulders Workout 1',
+        program: 'science',
+        exercises: [
+          { name: 'Lateral Raise (Dumbbell)', prescribed: 'Ignition: 1 × 8-12 to failure; then mini-sets' },
+          { name: 'Overhead Press (Dumbbell)', prescribed: 'As Push Press — Ignition set 1 × 8-12' }
+        ]
+      },
 
-    const SCI_TEMPLATES={
-      back1:{name:'Back - Workout 1',rows:[['Scap Pull-Down Primer','1-2 x 10-15 (submaximal)',''],['Seated Cable Row (Wide Elbows)','2-3 x 6-8 (to form failure)',''],['Narrow-Grip Lat Pulldown','2-3 x 10-12 (to failure + partials)',''],['Straight-Arm Pushdown','2-3 x 8-10 (to eccentric failure)',''],['One-and-a-Half Rep Dumbbell Pullover Ladder','1 x to failure',''],['Banded/Bodyweight Pull-Up','1 x to failure (+ partials)','']]},
-      back2:{name:'Back - Workout 2',rows:[['Face Pull (Primer)','2 x submaximal',''],['Barbell Row or Chest-Supported Row','2-3 x 6-8 (to form failure)',''],['Wide-Grip Pulldown','2-3 x 10-12 (to failure + partials)',''],['Dumbbell High Pull','2-3 x 8-10 (to form failure)',''],['One-and-a-Half Rep High Cable Row Ladder','1 x to failure/arm',''],['Inverted Row','1 x to failure (+ partials)','']]},
-      chest1:{name:'Chest - Workout 1',rows:[['Banded External Rotation (Primer)','1-2 x submaximal',''],['Incline Dumbbell Bench Press (Thumbs Up)','3 x 5-8',''],['Cable Crossover','3 x 10-12 (to failure + partials)',''],['Dumbbell Floor Fly (Mechanical Drop Set)','2-3 x 8-10 (to eccentric failure)',''],['Deficit One-and-a-Half Rep Push-Up Ladder','1 x to failure',''],['Bodyweight Dip','1 x to failure (+ partials)','']]},
-      chest2:{name:'Chest - Workout 2',rows:[['Band Pull-Apart (Primer)','1-2 x submaximal',''],['Dumbbell Bench Press','3 x 5-8',''],['High-to-Low Cable Crossover','3 x 10-12 (to failure + partials)',''],['Incline Cable Press','2-3 x 8-10 (to failure)',''],['Dip (Stretch Ladder)','1 x to failure',''],['Prison Yard Push-Up','1 x to failure','']]},
-      legs1:{name:'Legs - Workout 1',rows:[['Reverse Hyper (Primer)','1-2 x 10-15',''],['Deadlift','3 x 5',''],['Barbell Front Squat','2-3 x 6-8',''],['Alternating Dumbbell Reverse Lunge','2-3 x 10/leg (to failure)',''],['Seated Hamstring Curl or Slick Floor Bridge Curl','1 x 12-15 (to eccentric failure)',''],['Standing Calf Raise','2-3 x to failure','']]},
-      legs2:{name:'Legs - Workout 2',rows:[['Banded Overhead Squat (Primer)','1-2 x 10-15',''],['Barbell Back Squat','3 x 7',''],['Barbell Hip Thrust','2-3 x 6-8',''],['Dumbbell Spanish Squat','2-3 x 10 (to failure)',''],['Glute-Ham Raise (GHR) or Home GHR Alternative','1 x to failure (with eccentrics)',''],['Seated Calf Raise','2-3 x 10-12 (to failure + partials)','']]},
-      triceps1:{name:'Triceps - Workout 1',rows:[['Tricep Push Down','2-3 x 6-8 (to failure)',''],['Lying Dumbbell Extension','2-3 x 8-10 (to failure + eccentrics)',''],['Dumbbell/Cable Tricep Kickback','2-3 x 10-12 (to failure + partials)',''],['Cobra Push-Up','1 x to failure','']]},
-      triceps2:{name:'Triceps - Workout 2',rows:[['(Add movements)','TBD','']]},
-      shoulders1:{name:'Shoulders - Workout 1',rows:[['(Add movements)','TBD','']]},
-      shoulders2:{name:'Shoulders - Workout 2',rows:[['(Add movements)','TBD','']]},
-      shoulders_eff:{name:'Shoulders - Effective Reps',rows:[['Lateral Raise (Dumbbell)','Ignition: 1 x 8-12 to failure; then mini-sets to reach 20 effective reps — use 8-12RM. — Rest guidance included. — See tips column for detailed cadence suggestions.',''],['Overhead Press (Dumbbell)','As Push Press — Ignition set 1 x 8-12 to failure; then 5-7 mini-sets to reach 20 effective reps — prioritize bar speed; slight body English allowed.','']]}
+      // Powerlifting Program - Week 1-4
+      'power-w14-mon': {
+        name: 'Powerlifting - Week 1-4 Monday (Squat Focus)',
+        program: 'powerlifting',
+        exercises: [
+          { name: 'Squat', prescribed: '4 × 5' },
+          { name: 'Bench', prescribed: '3 × 8' },
+          { name: 'Row', prescribed: '3 × 10' },
+          { name: 'Plank', prescribed: '3 × 30s' }
+        ]
+      },
+      'power-w14-tue': {
+        name: 'Powerlifting - Week 1-4 Tuesday (Bench Focus)',
+        program: 'powerlifting',
+        exercises: [
+          { name: 'Bench', prescribed: '4 × 5' },
+          { name: 'Squat', prescribed: '3 × 8' },
+          { name: 'OH Press', prescribed: '3 × 10' },
+          { name: 'Leg Raise', prescribed: '3 × 10' }
+        ]
+      },
+      'power-w14-thu': {
+        name: 'Powerlifting - Week 1-4 Thursday (Deadlift Focus)',
+        program: 'powerlifting',
+        exercises: [
+          { name: 'Deadlift', prescribed: '4 × 5' },
+          { name: 'Bench', prescribed: '3 × 8' },
+          { name: 'Pull-Up', prescribed: '3 × 8' },
+          { name: 'Core: Russian Twists', prescribed: '3 × 20' }
+        ]
+      },
+      'power-w14-fri': {
+        name: 'Powerlifting - Week 1-4 Friday (Full Body)',
+        program: 'powerlifting',
+        exercises: [
+          { name: 'Squat', prescribed: '3 × 5' },
+          { name: 'Deadlift', prescribed: '3 × 5' },
+          { name: 'Bench', prescribed: '3 × 5' },
+          { name: 'Dip', prescribed: '3 × 10' }
+        ]
+      },
+
+      // Bodyweight Program - Week 1-4
+      'body-w14-mon': {
+        name: 'Bodyweight - Week 1-4 Monday (Push/Pull)',
+        program: 'bodyweight',
+        exercises: [
+          { name: 'Push-Up', prescribed: '4 × 8' },
+          { name: 'Pull-Up', prescribed: '4 × 6' },
+          { name: 'Dip', prescribed: '3 × 10' },
+          { name: 'Plank', prescribed: '3 × 30s' }
+        ]
+      },
+      'body-w14-tue': {
+        name: 'Bodyweight - Week 1-4 Tuesday (Legs/Core)',
+        program: 'bodyweight',
+        exercises: [
+          { name: 'Squat', prescribed: '4 × 15/leg' },
+          { name: 'Lunge', prescribed: '3 × 12/leg' },
+          { name: 'Leg Raise', prescribed: '3 × 10' },
+          { name: 'Superman', prescribed: '3 × 15' }
+        ]
+      },
+      'body-w14-thu': {
+        name: 'Bodyweight - Week 1-4 Thursday (Push/Legs)',
+        program: 'bodyweight',
+        exercises: [
+          { name: 'Push-Up', prescribed: '4 × 10' },
+          { name: 'Pistol Squat', prescribed: '3 × 6/leg' },
+          { name: 'Dip', prescribed: '3 × 12' },
+          { name: 'Side Plank', prescribed: '3 × 20s/side' }
+        ]
+      },
+      'body-w14-fri': {
+        name: 'Bodyweight - Week 1-4 Friday (Pull/Core)',
+        program: 'bodyweight',
+        exercises: [
+          { name: 'Inverted Row', prescribed: '4 × 10' },
+          { name: 'Chin-Up', prescribed: '4 × 8' },
+          { name: 'Leg Raise', prescribed: '3 × 12' },
+          { name: 'Bird Dog', prescribed: '3 × 10/side' }
+        ]
+      }
     };
 
-    function renderScienceConfig(){
-      ensureMeta(); config.innerHTML='';
-      const title=el('h2',{},'Science‑Based (Full Workout)');
-      const p=el('p',{class:'muted'},'Choose a template (Back/Chest/Legs/Shoulders/Triceps), then tweak TMs, rounding, and accessories.');
-      const tplSel=el('select',{});
-      [['back1','Back - Workout 1'],['back2','Back - Workout 2'],['chest1','Chest - Workout 1'],['chest2','Chest - Workout 2'],['legs1','Legs - Workout 1'],['legs2','Legs - Workout 2'],['triceps1','Triceps - Workout 1'],['triceps2','Triceps - Workout 2'],['shoulders1','Shoulders - Workout 1'],['shoulders2','Shoulders - Workout 2'],['shoulders_eff','Shoulders - Effective Reps']].forEach(([v,txt])=>{ const o=el('option',{value:v},txt); if((S.sci?.template||'back1')===v) o.selected=true; tplSel.appendChild(o); });
-      tplSel.addEventListener('input',()=>{ S.sci=S.sci||{}; S.sci.template=tplSel.value; saveState(); renderCurrentProgram(); });
+    // ============================================
+    // STATE MANAGEMENT
+    // ============================================
 
-      const grid4=el('div',{class:'grid-4'}), tm=S.tm;
-      [['Squat TM (lb)','squat'],['Bench TM (lb)','bench'],['Deadlift TM (lb)','dead'],['Overhead Press TM (lb)','ohp']].forEach(([label,key])=>{
-        const wrap=el('div',{}); wrap.appendChild(el('label',{},label));
-        const inp=el('input',{type:'number',min:'0',step:'5',value:tm[key]}); inp.addEventListener('input',()=>{ S.tm[key]=+inp.value||0; saveState(); renderCurrentProgram(); });
-        wrap.appendChild(inp); grid4.appendChild(wrap);
+    let currentWorkout = null;
+    let workoutLog = {};
+    let timerSeconds = 0;
+    let timerInterval = null;
+
+    // Load state from localStorage
+    function loadState() {
+      try {
+        const saved = localStorage.getItem('workout_tracker_log');
+        if (saved) {
+          workoutLog = JSON.parse(saved);
+        }
+      } catch (e) {
+        console.error('Failed to load state:', e);
+      }
+    }
+
+    // Save state to localStorage
+    function saveState() {
+      try {
+        localStorage.setItem('workout_tracker_log', JSON.stringify(workoutLog));
+      } catch (e) {
+        console.error('Failed to save state:', e);
+      }
+    }
+
+    // ============================================
+    // WORKOUT SELECTION & DISPLAY
+    // ============================================
+
+    function initWorkoutSelect() {
+      const select = document.getElementById('workout-select');
+      
+      // Group workouts by program
+      const groups = {
+        '5/3/1 BBB': ['bbb-ohp', 'bbb-dead', 'bbb-bench', 'bbb-squat'],
+        'Science-Based': ['sci-back1', 'sci-back2', 'sci-chest1', 'sci-chest2', 'sci-legs1', 'sci-legs2', 'sci-triceps1', 'sci-shoulders1'],
+        'Powerlifting (Week 1-4)': ['power-w14-mon', 'power-w14-tue', 'power-w14-thu', 'power-w14-fri'],
+        'Bodyweight (Week 1-4)': ['body-w14-mon', 'body-w14-tue', 'body-w14-thu', 'body-w14-fri']
+      };
+
+      Object.entries(groups).forEach(([groupName, workoutIds]) => {
+        const optgroup = document.createElement('optgroup');
+        optgroup.label = groupName;
+        workoutIds.forEach(id => {
+          const option = document.createElement('option');
+          option.value = id;
+          option.textContent = WORKOUTS[id].name;
+          optgroup.appendChild(option);
+        });
+        select.appendChild(optgroup);
       });
 
-      const roundSel=el('select',{}); [['1','1 lb'],['2.5','2.5 lb'],['5','5 lb'],['10','10 lb']].forEach(([v,txt])=>{ const opt=el('option',{value:v},txt); if(+S.round===+v) opt.selected=true; roundSel.appendChild(opt); });
-      roundSel.addEventListener('input',()=>{ S.round=+roundSel.value; saveState(); renderCurrentProgram(); });
-
-      const topGrid=el('div',{class:'grid',style:'margin-top:12px'});
-      const tplWrap=el('div',{}); tplWrap.appendChild(el('label',{},'Template')); tplWrap.appendChild(tplSel);
-      const roundWrap=el('div',{}); roundWrap.appendChild(el('label',{},'Round to nearest')); roundWrap.appendChild(roundSel);
-      topGrid.appendChild(tplWrap); topGrid.appendChild(roundWrap);
-
-      const accCard=el('div',{}); accCard.appendChild(el('h3',{},'Accessories (sets × reps @ RPE — notes)'));
-      const accLists={ ohp:['Dips','Lateral Raises','Face Pulls','Triceps Pushdowns','Incline DB Press','Push‑ups'], dead:['Back Extensions','Hanging Leg Raises','Hamstring Curls','Barbell Rows','Pull‑ups','Reverse Hypers'], bench:['DB Incline Press','Triceps Pushdowns','Chest Flyes','Push‑ups','CGBP','Face Pulls'], squat:['Leg Press','Walking Lunges','Bulgarian Split Squats','Leg Extensions','Hack Squat','Calf Raises'] };
-      const days=[{label:'Day 1 — Overhead Press',key:'ohp'},{label:'Day 2 — Deadlift',key:'dead'},{label:'Day 3 — Bench',key:'bench'},{label:'Day 4 — Squat',key:'squat'}];
-      function buildRow(d){ const row=el('div',{}); row.appendChild(el('h4',{},d.label)); ['A','B'].forEach((slot,i)=>{ const meta=getAccMeta(d.key,i); const wrap=el('div',{class:'grid',style:'margin:6px 0'}); const sel=el('select',{}); (accLists[d.key]||[]).forEach(name=>{ const o=el('option',{value:name},name); if((S.acc?.[d.key]||[])[i]===name) o.selected=true; sel.appendChild(o); }); sel.addEventListener('input',()=>{ const arr=S.acc[d.key]||['','']; arr[i]=sel.value; S.acc[d.key]=arr; saveState(); renderCurrentProgram(); }); const sets=el('input',{type:'number',min:'1',max:'10',step:'1',value:meta.sets}); sets.addEventListener('input',()=>{ setAccMeta(d.key,i,'sets',+sets.value||0); renderCurrentProgram(); }); const reps=el('input',{type:'number',min:'1',max:'30',step:'1',value:meta.reps}); reps.addEventListener('input',()=>{ setAccMeta(d.key,i,'reps',+reps.value||0); renderCurrentProgram(); }); const rpe=el('input',{type:'number',min:'5',max:'10',step:'0.5',value:meta.rpe}); rpe.addEventListener('input',()=>{ setAccMeta(d.key,i,'rpe',+rpe.value||0); renderCurrentProgram(); }); const notes=el('input',{type:'text',placeholder:'Notes (optional)',value:meta.notes||''}); notes.addEventListener('input',()=>{ setAccMeta(d.key,i,'notes',notes.value); }); const c1=el('div',{}); c1.appendChild(el('label',{},`Accessory ${slot}`)); c1.appendChild(sel); const c2=el('div',{}); c2.appendChild(el('label',{},'Sets')); c2.appendChild(sets); const c3=el('div',{}); c3.appendChild(el('label',{},'Reps')); c3.appendChild(reps); const c4=el('div',{}); c4.appendChild(el('label',{},'RPE')); c4.appendChild(rpe); const c5=el('div',{style:'grid-column:1/-1'}); c5.appendChild(el('label',{},'Notes')); c5.appendChild(notes); wrap.appendChild(c1); wrap.appendChild(c2); wrap.appendChild(c3); wrap.appendChild(c4); wrap.appendChild(c5); row.appendChild(wrap); }); return row; }
-      days.forEach(d=>{ if(!S.acc[d.key]) S.acc[d.key]=['','']; accCard.appendChild(buildRow(d)); });
-
-      const actions=el('div',{style:'display:flex;gap:8px;margin-top:10px;flex-wrap:wrap'});
-      function btn(txt,cb){ const b=el('button',{},txt); b.style.cssText='padding:10px 12px;border-radius:10px;border:1px solid var(--ring);background:#0f1320;color:var(--text);cursor:pointer'; b.addEventListener('click',cb); return b; }
-      function download(name,text){ const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([text],{type:'text/plain'})); a.download=name; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),2000); }
-      actions.appendChild(btn('Save Progress',()=>download('workout-save.json',JSON.stringify(S,null,2))));
-      actions.appendChild(btn('Load Progress',()=>{ const t=prompt('Paste JSON saved from "Save Progress":'); if(!t) return; try{ const obj=JSON.parse(t); S=Object.assign({},S,obj); saveState(); renderCurrentProgram(); }catch(e){ alert('Invalid JSON'); } }));
-      actions.appendChild(btn('Reset',()=>{ S=JSON.parse(JSON.stringify(defaultState)); saveState(); renderCurrentProgram(); }));
-      actions.appendChild(btn('Export as Text',()=>{ const tpl=SCI_TEMPLATES[(S.sci&&S.sci.template)||'back1']; let lines=[`${tpl.name}`,'','Exercise\tDuration/Reps\tSets']; tpl.rows.forEach(r=>lines.push(r.join('\t'))); download('workout.txt',lines.join('\n')); }));
-
-      config.appendChild(title); config.appendChild(p); config.appendChild(tplWrap); config.appendChild(grid4); config.appendChild(topGrid); config.appendChild(accCard); config.appendChild(actions);
+      select.addEventListener('change', (e) => {
+        if (e.target.value) {
+          displayWorkout(e.target.value);
+        } else {
+          hideWorkout();
+        }
+      });
     }
 
-    function renderScienceOutput(){
-      const tplKey=(S.sci&&S.sci.template)||'back1';
-      const tpl=SCI_TEMPLATES[tplKey]||SCI_TEMPLATES['back1'];
-      const table=el('table',{id:'sci-table','aria-label':'Science-based table'});
-      table.innerHTML=`<thead><tr><th>Exercise</th><th>Duration/Reps</th><th>Sets</th></tr></thead><tbody></tbody>`;
-      const tbody=$('tbody',table);
-      tpl.rows.forEach(([ex,dr,setc])=>{ const tr=el('tr',{},`<td>${ex}</td><td>${dr}</td><td>${setc||''}</td>`); tbody.appendChild(tr); });
-      out.innerHTML=''; out.appendChild(el('h3',{},tpl.name)); out.appendChild(table); out.appendChild(el('p',{class:'muted'},'Template is editable via the accessory section and rounding settings above.'));
+    function displayWorkout(workoutId) {
+      currentWorkout = workoutId;
+      const workout = WORKOUTS[workoutId];
+      
+      document.getElementById('workout-title').textContent = workout.name;
+      document.getElementById('empty-state').style.display = 'none';
+      document.getElementById('workout-card').style.display = 'block';
+
+      const tbody = document.getElementById('workout-body');
+      tbody.innerHTML = '';
+
+      workout.exercises.forEach((exercise, idx) => {
+        const tr = document.createElement('tr');
+        
+        // Exercise name
+        const tdName = document.createElement('td');
+        tdName.className = 'exercise-name';
+        tdName.textContent = exercise.name;
+        
+        // Prescribed
+        const tdPrescribed = document.createElement('td');
+        tdPrescribed.className = 'prescribed';
+        tdPrescribed.textContent = exercise.prescribed;
+        
+        // Log inputs
+        const tdLog = document.createElement('td');
+        const logDiv = document.createElement('div');
+        
+        const inputsDiv = document.createElement('div');
+        inputsDiv.className = 'log-inputs';
+        
+        const repsInput = document.createElement('input');
+        repsInput.type = 'number';
+        repsInput.placeholder = 'Reps';
+        repsInput.min = '0';
+        repsInput.id = `reps-${idx}`;
+        
+        const weightInput = document.createElement('input');
+        weightInput.type = 'number';
+        weightInput.placeholder = 'Weight';
+        weightInput.min = '0';
+        weightInput.step = '2.5';
+        weightInput.id = `weight-${idx}`;
+        
+        const addBtn = document.createElement('button');
+        addBtn.textContent = 'Add Set';
+        addBtn.onclick = () => logSet(workoutId, idx, exercise.name);
+        
+        inputsDiv.appendChild(repsInput);
+        inputsDiv.appendChild(weightInput);
+        inputsDiv.appendChild(addBtn);
+        
+        // Display logged sets
+        const loggedDiv = document.createElement('div');
+        loggedDiv.className = 'logged-sets';
+        loggedDiv.id = `logged-${idx}`;
+        updateLoggedSets(workoutId, idx);
+        
+        logDiv.appendChild(inputsDiv);
+        logDiv.appendChild(loggedDiv);
+        tdLog.appendChild(logDiv);
+        
+        tr.appendChild(tdName);
+        tr.appendChild(tdPrescribed);
+        tr.appendChild(tdLog);
+        tbody.appendChild(tr);
+      });
     }
 
-    function renderBBBConfig(){
-      const accLists={ ohp:['Dips','Lateral Raises','Face Pulls','Triceps Pushdowns','Incline DB Press','Push‑ups'], dead:['Back Extensions','Hanging Leg Raises','Hamstring Curls','Barbell Rows','Pull‑ups','Reverse Hypers'], bench:['DB Incline Press','Triceps Pushdowns','Chest Flyes','Push‑ups','CGBP','Face Pulls'], squat:['Leg Press','Walking Lunges','Bulgarian Split Squats','Leg Extensions','Hack Squat','Calf Raises'] };
-      ensureMeta(); config.innerHTML='';
-      const title=el('h2',{},'5/3/1 — Boring But Big');
-      const p=el('p',{class:'muted'},'Enter TMs (~90% 1RM), choose week & BBB %, auto‑calculates main sets and 5×10 assistance. Pick accessories + targets for each day.');
-      const grid4=el('div',{class:'grid-4'}), tm=S.tm;
-      [['Squat TM (lb)','squat'],['Bench TM (lb)','bench'],['Deadlift TM (lb)','dead'],['Overhead Press TM (lb)','ohp']].forEach(([label,key])=>{ const wrap=el('div',{}); wrap.appendChild(el('label',{},label)); const inp=el('input',{type:'number',min:'0',step:'5',value:tm[key]}); inp.addEventListener('input',()=>{ S.tm[key]=+inp.value||0; saveState(); renderCurrentProgram(); }); wrap.appendChild(inp); grid4.appendChild(wrap); });
-      const grid=el('div',{class:'grid',style:'margin-top:12px'});
-      const weekSel=el('select',{}); [['1','Week 1 — 65/75/85 × 5+'],['2','Week 2 — 70/80/90 × 3+'],['3','Week 3 — 75/85/95 × 1+'],['4','Week 4 — Deload 40/50/60 × 5']].forEach(([v,txt])=>{ const opt=el('option',{value:v},txt); if(S.week===v) opt.selected=true; weekSel.appendChild(opt); });
-      weekSel.addEventListener('input',()=>{ S.week=weekSel.value; saveState(); renderCurrentProgram(); });
-      const bbbSel=el('select',{}); [['0.5','50%'],['0.6','60%'],['0.7','70%']].forEach(([v,txt])=>{ const opt=el('option',{value:v},txt); if(+S.bbbpct===+v) opt.selected=true; bbbSel.appendChild(opt); });
-      bbbSel.addEventListener('input',()=>{ S.bbbpct=+bbbSel.value; saveState(); renderCurrentProgram(); });
-      const roundSel=el('select',{}); [['1','1 lb'],['2.5','2.5 lb'],['5','5 lb'],['10','10 lb']].forEach(([v,txt])=>{ const opt=el('option',{value:v},txt); if(+S.round===+v) opt.selected=true; roundSel.appendChild(opt); });
-      roundSel.addEventListener('input',()=>{ S.round=+roundSel.value; saveState(); renderCurrentProgram(); });
-      const wWrap=el('div',{}); wWrap.appendChild(el('label',{},'Week')); wWrap.appendChild(weekSel);
-      const bWrap=el('div',{}); bWrap.appendChild(el('label',{},'BBB % of TM (5×10)')); bWrap.appendChild(bbbSel);
-      grid.appendChild(wWrap); grid.appendChild(bWrap);
-      const roundWrap=el('div',{style:'margin-top:12px;max-width:240px'}); roundWrap.appendChild(el('label',{},'Round to nearest')); roundWrap.appendChild(roundSel);
-      const accCard=el('div',{}); accCard.appendChild(el('h3',{},'Accessories (sets × reps @ RPE — notes)'));
-      const days=[{label:'Day 1 — Overhead Press',key:'ohp'},{label:'Day 2 — Deadlift',key:'dead'},{label:'Day 3 — Bench',key:'bench'},{label:'Day 4 — Squat',key:'squat'}];
-      function buildRow(d){ const row=el('div',{}); row.appendChild(el('h4',{},d.label)); ['A','B'].forEach((slot,i)=>{ const meta=getAccMeta(d.key,i); const wrap=el('div',{class:'grid',style:'margin:6px 0'}); const sel=el('select',{}); (accLists[d.key]||[]).forEach(name=>{ const o=el('option',{value:name},name); if((S.acc?.[d.key]||[])[i]===name) o.selected=true; sel.appendChild(o); }); sel.addEventListener('input',()=>{ const arr=S.acc[d.key]||['','']; arr[i]=sel.value; S.acc[d.key]=arr; saveState(); renderCurrentProgram(); }); const sets=el('input',{type:'number',min:'1',max:'10',step:'1',value:meta.sets}); sets.addEventListener('input',()=>{ setAccMeta(d.key,i,'sets',+sets.value||0); renderCurrentProgram(); }); const reps=el('input',{type:'number',min:'1',max:'30',step:'1',value:meta.reps}); reps.addEventListener('input',()=>{ setAccMeta(d.key,i,'reps',+reps.value||0); renderCurrentProgram(); }); const rpe=el('input',{type:'number',min:'5',max:'10',step:'0.5',value:meta.rpe}); rpe.addEventListener('input',()=>{ setAccMeta(d.key,i,'rpe',+rpe.value||0); renderCurrentProgram(); }); const notes=el('input',{type:'text',placeholder:'Notes (optional)',value:meta.notes||''}); notes.addEventListener('input',()=>{ setAccMeta(d.key,i,'notes',notes.value); }); const c1=el('div',{}); c1.appendChild(el('label',{},`Accessory ${slot}`)); c1.appendChild(sel); const c2=el('div',{}); c2.appendChild(el('label',{},'Sets')); c2.appendChild(sets); const c3=el('div',{}); c3.appendChild(el('label',{},'Reps')); c3.appendChild(reps); const c4=el('div',{}); c4.appendChild(el('label',{},'RPE')); c4.appendChild(rpe); const c5=el('div',{style:'grid-column:1/-1'}); c5.appendChild(el('label',{},'Notes')); c5.appendChild(notes); wrap.appendChild(c1); wrap.appendChild(c2); wrap.appendChild(c3); wrap.appendChild(c4); wrap.appendChild(c5); row.appendChild(wrap); }); return row; }
-      days.forEach(d=>{ if(!S.acc[d.key]) S.acc[d.key]=['','']; accCard.appendChild(buildRow(d)); });
-      config.appendChild(title); config.appendChild(p); config.appendChild(grid4); config.appendChild(grid); config.appendChild(roundWrap); config.appendChild(accCard);
+    function hideWorkout() {
+      currentWorkout = null;
+      document.getElementById('empty-state').style.display = 'block';
+      document.getElementById('workout-card').style.display = 'none';
     }
 
-    function renderBBBTable(){
-      const weeks={1:[0.65,0.75,0.85],2:[0.70,0.80,0.90],3:[0.75,0.85,0.95],4:[0.40,0.50,0.60]};
-      const days=[{name:'Day 1',lift:'Overhead Press',key:'ohp'},{name:'Day 2',lift:'Deadlift',key:'dead'},{name:'Day 3',lift:'Bench',key:'bench'},{name:'Day 4',lift:'Squat',key:'squat'}];
-      const tm=S.tm, wk=S.week, p=weeks[wk], bbbpct=+S.bbbpct, rnd=+S.round;
-      const table=el('table',{id:'bbb-table','aria-label':'5/3/1 table'});
-      table.innerHTML=`<thead><tr><th>Day</th><th>Lift</th><th>Set 1</th><th>Set 2</th><th>Set 3 (AMRAP)</th><th>BBB 5×10</th><th>Accessories</th></tr></thead><tbody></tbody>`;
-      const tbody=$('tbody',table);
-      days.forEach(d=>{ const t=tm[d.key]||0; const s1=roundTo(t*p[0],rnd); const s2=roundTo(t*p[1],rnd); const s3=roundTo(t*p[2],rnd); const bbb=roundTo(t*bbbpct,rnd); const amrap=(wk==='4')?'×5':(wk==='1'?'×5+':(wk==='2'?'×3+':'×1+')); const tr=el('tr',{},`<td>${d.name}</td><td>${d.lift}</td><td>${fmt(s1)} × ${wk==='4'?'5':'5'}</td><td>${fmt(s2)} × ${wk==='4'?'5':'5'}</td><td>${fmt(s3)} ${amrap}</td><td>${fmt(bbb)} × 10 (5 sets)</td><td>${accStr(d.key)}</td>`); tbody.appendChild(tr); });
-      out.innerHTML=''; out.appendChild(el('h3',{},'Program Output')); out.appendChild(table); out.appendChild(el('p',{class:'muted'},'Main sets follow classic 5/3/1. BBB is 5×10 at the chosen percentage.'));
+    function logSet(workoutId, exerciseIdx, exerciseName) {
+      const reps = document.getElementById(`reps-${exerciseIdx}`).value;
+      const weight = document.getElementById(`weight-${exerciseIdx}`).value;
+      
+      if (!reps || !weight) {
+        alert('Please enter both reps and weight');
+        return;
+      }
+
+      // Initialize workout log structure
+      if (!workoutLog[workoutId]) {
+        workoutLog[workoutId] = {};
+      }
+      if (!workoutLog[workoutId][exerciseName]) {
+        workoutLog[workoutId][exerciseName] = [];
+      }
+
+      // Add the set
+      workoutLog[workoutId][exerciseName].push({
+        reps: parseInt(reps),
+        weight: parseFloat(weight),
+        timestamp: new Date().toISOString()
+      });
+
+      // Clear inputs
+      document.getElementById(`reps-${exerciseIdx}`).value = '';
+      document.getElementById(`weight-${exerciseIdx}`).value = '';
+
+      // Update display
+      updateLoggedSets(workoutId, exerciseIdx);
+      saveState();
     }
 
-    function runTests(){ const results=[]; function pass(m){results.push(`<span class="chip ok">PASS</span> ${m}`);} function fail(m){results.push(`<span class="chip bad">FAIL</span> ${m}`);} const prev=S.program; try{ S.program='science'; renderCurrentProgram(); if($('#sci-table')||$('#program-output table')) pass('Science output renders a table.'); else fail('Science output table missing'); S.program='bbb531'; renderCurrentProgram(); if($('#bbb-table')) pass('BBB output renders table.'); else fail('BBB output table missing'); const badgeText=$('#program-badge').textContent.toLowerCase(); if(badgeText.includes('boring')||badgeText.includes('science')) pass('Program badge updates.'); else fail('Program badge did not update'); }catch(e){ fail('Tests threw: '+e.message); } S.program=prev; renderCurrentProgram(); $('#test-results').innerHTML=results.map(r=>`<div>${r}</div>`).join(''); }
+    function updateLoggedSets(workoutId, exerciseIdx) {
+      const workout = WORKOUTS[workoutId];
+      const exercise = workout.exercises[exerciseIdx];
+      const loggedDiv = document.getElementById(`logged-${exerciseIdx}`);
+      
+      if (!loggedDiv) return;
 
-    const programs={ 'science':{ name:'Science‑Based (Full Workout)', renderConfig:renderScienceConfig, renderOutput:renderScienceOutput }, 'bbb531':{ name:'5/3/1 — Boring But Big', renderConfig:renderBBBConfig, renderOutput:renderBBBTable } };
+      const sets = workoutLog[workoutId]?.[exercise.name] || [];
+      
+      if (sets.length === 0) {
+        loggedDiv.innerHTML = '';
+        return;
+      }
 
-    function renderCurrentProgram(){ const id=S.program; const prog=programs[id]||programs['bbb531']; progBadge.textContent=prog.name; prog.renderConfig(); prog.renderOutput(); }
+      loggedDiv.innerHTML = sets.map((set, i) => 
+        `<span class="logged-set">${set.weight}lb × ${set.reps}</span>`
+      ).join('');
+    }
 
-    progSelect.value=S.program;
-    progSelect.addEventListener('input',()=>{ S.program=progSelect.value; saveState(); renderCurrentProgram(); runTests(); });
+    // ============================================
+    // REST TIMER
+    // ============================================
 
-    renderCurrentProgram(); runTests();
-  })();
-  </script>
-  <script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW registration failed:', err));
+    function setTimer(seconds) {
+      timerSeconds = seconds;
+      updateTimerDisplay();
+    }
+
+    function startTimer() {
+      if (timerInterval) return;
+      if (timerSeconds === 0) {
+        alert('Set a timer duration first (30s, 60s, or 90s)');
+        return;
+      }
+
+      timerInterval = setInterval(() => {
+        timerSeconds--;
+        updateTimerDisplay();
+
+        if (timerSeconds === 0) {
+          clearInterval(timerInterval);
+          timerInterval = null;
+          
+          // Notification
+          if ('Notification' in window && Notification.permission === 'granted') {
+            new Notification('Rest Complete!', {
+              body: 'Time for next set',
+              icon: './icon-192.png'
+            });
+          }
+          
+          // Vibration
+          if ('vibrate' in navigator) {
+            navigator.vibrate([200, 100, 200]);
+          }
+          
+          alert('Rest complete! 💪');
+        }
+      }, 1000);
+    }
+
+    function pauseTimer() {
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+    }
+
+    function resetTimer() {
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+      timerSeconds = 0;
+      updateTimerDisplay();
+    }
+
+    function updateTimerDisplay() {
+      const display = document.getElementById('timer-display');
+      const mins = Math.floor(timerSeconds / 60);
+      const secs = timerSeconds % 60;
+      display.textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    // ============================================
+    // SAVE/LOAD/EXPORT
+    // ============================================
+
+    function saveWorkout() {
+      const json = JSON.stringify(workoutLog, null, 2);
+      const blob = new Blob([json], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `workout-log-${new Date().toISOString().split('T')[0]}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      alert('Workout log saved! 💾');
+    }
+
+    function loadWorkout() {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.json';
+      input.onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          try {
+            workoutLog = JSON.parse(e.target.result);
+            saveState();
+            if (currentWorkout) {
+              displayWorkout(currentWorkout);
+            }
+            alert('Workout log loaded! 📂');
+          } catch (err) {
+            alert('Failed to load file. Invalid JSON.');
+          }
+        };
+        reader.readAsText(file);
+      };
+      input.click();
+    }
+
+    function exportWorkout() {
+      if (!currentWorkout) {
+        alert('Select a workout first');
+        return;
+      }
+
+      const workout = WORKOUTS[currentWorkout];
+      let text = `${workout.name}\n${'='.repeat(workout.name.length)}\n\n`;
+
+      workout.exercises.forEach(exercise => {
+        text += `${exercise.name}\n`;
+        text += `Prescribed: ${exercise.prescribed}\n`;
+        
+        const sets = workoutLog[currentWorkout]?.[exercise.name] || [];
+        if (sets.length > 0) {
+          text += 'Logged: ';
+          text += sets.map(s => `${s.weight}lb × ${s.reps}`).join(', ');
+          text += '\n';
+        }
+        text += '\n';
+      });
+
+      const blob = new Blob([text], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${workout.name.replace(/[^a-z0-9]/gi, '-').toLowerCase()}.txt`;
+      a.click();
+      URL.revokeObjectURL(url);
+      alert('Workout exported! 📤');
+    }
+
+    // ============================================
+    // INITIALIZATION
+    // ============================================
+
+    window.addEventListener('DOMContentLoaded', () => {
+      loadState();
+      initWorkoutSelect();
+      updateTimerDisplay();
+      
+      // Request notification permission
+      if ('Notification' in window && Notification.permission === 'default') {
+        setTimeout(() => Notification.requestPermission(), 2000);
+      }
     });
-  }
+  </script>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW registration failed:', err));
+      });
+    }
   </script>
 </body>
 </html>
