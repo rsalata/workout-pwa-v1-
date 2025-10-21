@@ -131,30 +131,35 @@
       font-size: 14px;
     }
     .log-inputs {
-      display: flex;
-      gap: 8px;
-      align-items: center;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 10px;
     }
     .log-inputs input {
       margin: 0;
-      flex: 1;
+      width: 100%;
+      padding: 14px 12px;
+      font-size: 16px;
     }
-    .log-inputs button {
+    .add-set-btn {
       margin: 0;
-      flex-shrink: 0;
-      padding: 12px 16px;
+      padding: 14px 20px;
+      font-size: 16px;
+      width: 100%;
     }
     .logged-sets {
-      margin-top: 8px;
+      margin-top: 12px;
       font-size: 14px;
     }
     .logged-set {
       display: inline-block;
       background: var(--panel);
-      padding: 4px 10px;
-      border-radius: 6px;
-      margin: 2px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      margin: 4px 4px 4px 0;
       border: 1px solid var(--ring);
+      font-weight: 500;
     }
     .empty-state {
       text-align: center;
@@ -165,8 +170,14 @@
       display: none;
     }
     @media (max-width: 768px) {
+      .log-inputs {
+        grid-template-columns: 1fr;
+      }
       th:nth-child(2), td:nth-child(2) {
         display: none;
+      }
+      .add-set-btn {
+        margin-top: 8px;
       }
     }
   </style>
@@ -561,6 +572,14 @@
         const inputsDiv = document.createElement('div');
         inputsDiv.className = 'log-inputs';
         
+        const setsInput = document.createElement('input');
+        setsInput.type = 'number';
+        setsInput.placeholder = 'Sets';
+        setsInput.min = '1';
+        setsInput.max = '10';
+        setsInput.value = '1';
+        setsInput.id = `sets-${idx}`;
+        
         const repsInput = document.createElement('input');
         repsInput.type = 'number';
         repsInput.placeholder = 'Reps';
@@ -569,18 +588,19 @@
         
         const weightInput = document.createElement('input');
         weightInput.type = 'number';
-        weightInput.placeholder = 'Weight';
+        weightInput.placeholder = 'Weight (lb)';
         weightInput.min = '0';
         weightInput.step = '2.5';
         weightInput.id = `weight-${idx}`;
         
         const addBtn = document.createElement('button');
+        addBtn.className = 'add-set-btn';
         addBtn.textContent = 'Add Set';
         addBtn.onclick = () => logSet(workoutId, idx, exercise.name);
         
+        inputsDiv.appendChild(setsInput);
         inputsDiv.appendChild(repsInput);
         inputsDiv.appendChild(weightInput);
-        inputsDiv.appendChild(addBtn);
         
         // Display logged sets
         const loggedDiv = document.createElement('div');
@@ -589,6 +609,7 @@
         updateLoggedSets(workoutId, idx);
         
         logDiv.appendChild(inputsDiv);
+        logDiv.appendChild(addBtn);
         logDiv.appendChild(loggedDiv);
         tdLog.appendChild(logDiv);
         
@@ -606,13 +627,16 @@
     }
 
     function logSet(workoutId, exerciseIdx, exerciseName) {
+      const sets = document.getElementById(`sets-${exerciseIdx}`).value;
       const reps = document.getElementById(`reps-${exerciseIdx}`).value;
       const weight = document.getElementById(`weight-${exerciseIdx}`).value;
       
       if (!reps || !weight) {
-        alert('Please enter both reps and weight');
+        alert('Please enter reps and weight');
         return;
       }
+
+      const numSets = parseInt(sets) || 1;
 
       // Initialize workout log structure
       if (!workoutLog[workoutId]) {
@@ -622,14 +646,17 @@
         workoutLog[workoutId][exerciseName] = [];
       }
 
-      // Add the set
-      workoutLog[workoutId][exerciseName].push({
-        reps: parseInt(reps),
-        weight: parseFloat(weight),
-        timestamp: new Date().toISOString()
-      });
+      // Add the sets
+      for (let i = 0; i < numSets; i++) {
+        workoutLog[workoutId][exerciseName].push({
+          reps: parseInt(reps),
+          weight: parseFloat(weight),
+          timestamp: new Date().toISOString()
+        });
+      }
 
       // Clear inputs
+      document.getElementById(`sets-${exerciseIdx}`).value = '1';
       document.getElementById(`reps-${exerciseIdx}`).value = '';
       document.getElementById(`weight-${exerciseIdx}`).value = '';
 
@@ -652,9 +679,10 @@
         return;
       }
 
-      loggedDiv.innerHTML = sets.map((set, i) => 
-        `<span class="logged-set">${set.weight}lb × ${set.reps}</span>`
-      ).join('');
+      loggedDiv.innerHTML = '<div style="color: var(--muted); font-size: 13px; margin-bottom: 6px;">Logged:</div>' + 
+        sets.map((set, i) => 
+          `<span class="logged-set">${set.weight}lb × ${set.reps}</span>`
+        ).join('');
     }
 
     // ============================================
